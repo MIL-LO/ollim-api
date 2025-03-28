@@ -1,5 +1,8 @@
 spring:
   application:
     name: core
-  profiles:
-    active: private
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+
