@@ -1,5 +1,6 @@
 ### CUSTOM ###
 application-private.yml
+.env
 
 HELP.md
 .gradle
