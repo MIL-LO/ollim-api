@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: app-api
+  profiles:
+    active: private
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    operations-sorter: method
+    oauth:
+      client-id: ENC(WYlgpuOiGMJ1O2UUBxiQTmU4n50jYSGOy7az1c262+yyPsDcDD1wr+cjxLq+NEGBpHyiXOsAbDf3I110CMPPlvry3zn29kk13xqpeyRpVd6wfBoNaIrEspCaERnp8eteNb5Q3CMqlMXe/vsZgAxuBg==)
+      client-secret: ENC(77K6sNM0WzQeON7VggZXZaQ+oocL3N+HjjT1hPxXmIPeePkcNpXY8kjv2WmnMVCYznMBMxpZ34hSWHxp+sYKSOtkHQNl8hTTgkTq3KmmQnE=)
+      use-basic-authentication-with-access-code-grant: true
