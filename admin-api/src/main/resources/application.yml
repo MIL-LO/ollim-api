@@ -16,3 +16,10 @@ management:
   observations:
     key-values:
       application: ${spring.application.name}
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${spring.profiles.active:default}
+  send-default-pii: true
+  traces-sample-rate: 1.0
+
