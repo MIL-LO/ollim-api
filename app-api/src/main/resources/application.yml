@@ -11,6 +11,25 @@ springdoc:
     path: /swagger-ui
     operations-sorter: method
     oauth:
-      client-id: ENC(WYlgpuOiGMJ1O2UUBxiQTmU4n50jYSGOy7az1c262+yyPsDcDD1wr+cjxLq+NEGBpHyiXOsAbDf3I110CMPPlvry3zn29kk13xqpeyRpVd6wfBoNaIrEspCaERnp8eteNb5Q3CMqlMXe/vsZgAxuBg==)
+      client-id: ENC(WYlgpuOiGMJ1O2UUBxiQTmU4n50-jYSGOy7az1c262+yyPsDcDD1wr+cjxLq+NEGBpHyiXOsAbDf3I110CMPPlvry3zn29kk13xqpeyRpVd6wfBoNaIrEspCaERnp8eteNb5Q3CMqlMXe/vsZgAxuBg==)
       client-secret: ENC(77K6sNM0WzQeON7VggZXZaQ+oocL3N+HjjT1hPxXmIPeePkcNpXY8kjv2WmnMVCYznMBMxpZ34hSWHxp+sYKSOtkHQNl8hTTgkTq3KmmQnE=)
       use-basic-authentication-with-access-code-grant: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active:default}
+  observations:
+    key-values:
+      application: ${spring.application.name}
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  environment: ${spring.profiles.active:default}
+  send-default-pii: true
+  traces-sample-rate: 1.0
