@@ -3,6 +3,8 @@ spring:
     name: app-api
   profiles:
     active: private
+  config:
+    import: optional:file:../.env[.properties]
 
 springdoc:
   api-docs:
