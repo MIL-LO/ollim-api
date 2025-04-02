@@ -10,7 +10,7 @@ class SentryIntegrationTest {
     @Test
     fun `Sentry에 예외 전송 테스트`() {
         try {
-            throw Exception("Sentry 테스트 예외입니다.")
+            throw Exception("Sentry admin-api 테스트 예외입니다.")
         } catch (e: Exception) {
             Sentry.captureException(e)
         }
