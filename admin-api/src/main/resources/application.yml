@@ -3,6 +3,8 @@ spring:
     name: admin-api
   profiles:
     active: private
+  config:
+    import: optional:file:../.env[.properties]
 
 management:
   endpoints:
@@ -22,4 +24,3 @@ sentry:
   environment: ${spring.profiles.active:default}
   send-default-pii: true
   traces-sample-rate: 1.0
-

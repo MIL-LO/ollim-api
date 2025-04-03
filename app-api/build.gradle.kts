@@ -38,10 +38,10 @@ dependencies {
 }
 
 sentry {
-    includeSourceContext.set(true) // Sentry에서 소스 코드 보여주기
-    org.set("millo-j0")            // Sentry 조직 이름
-    projectName.set("ollim-api-wn") // Sentry 프로젝트 이름
-    authToken.set(System.getenv("SENTRY_AUTH_TOKEN")) // 환경변수로 인증 토큰 설정
+    includeSourceContext.set(true)
+    org.set("millo-j0")
+    projectName.set("ollim-api")
+    authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
 }
 
 tasks.named<Jar>("jar") {

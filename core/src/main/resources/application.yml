@@ -1,6 +1,8 @@
 spring:
   application:
     name: core
+  config:
+    import: optional:file:../.env[.properties]
 
 jasypt:
   encryptor:
