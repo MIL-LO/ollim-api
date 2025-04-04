@@ -1,0 +1,66 @@
+name: CI with Gradle
+
+on:
+  pull_request:
+    branches: [ "dev", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17 with Corretto
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # admin-api의 application-private.yml 파일 생성
+      - name: Create admin-api environment file
+        run: |
+          mkdir -p admin-api/src/main/resources
+          echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
+
+      # app-api의 application-private.yml 파일 생성
+      - name: Create app-api environment file
+        run: |
+          mkdir -p app-api/src/main/resources
+          echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
+
+      # 루트 디렉토리의 .env 파일 생성 (여러 환경 변수들을 포함)
+      - name: Create .env file
+        run: echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
+
+      # .env 파일을 source 하여 환경 변수들을 로드한 후 빌드 수행
+      - name: Build and Test with Gradle
+        run: . ./.env && ./gradlew clean build
+
+  dependency-submission:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17 with Corretto for dependency submission
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5
