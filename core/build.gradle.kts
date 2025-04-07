@@ -6,8 +6,11 @@ plugins {
 
 dependencies {
 
+    // spring-jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
+
+    // spring-validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
