@@ -7,10 +7,11 @@ plugins {
 dependencies {
 	implementation(project(":core"))
 
+    // spring-web
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
-    // JPA
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // spring-jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // Redis
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")

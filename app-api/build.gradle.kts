@@ -10,6 +10,9 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":infrastructure"))
 
+    // JPA
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
     // Spring Boot 기본
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
