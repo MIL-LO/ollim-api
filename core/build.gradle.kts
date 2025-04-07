@@ -5,8 +5,9 @@ plugins {
 }
 
 dependencies {
-//    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    // JPA 어노테이션 및 인터페이스
+    implementation("jakarta.persistence:jakarta.persistence-api:3.1.0")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
