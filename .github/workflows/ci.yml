@@ -38,19 +38,19 @@ jobs:
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
 
-      # service-api의 application-test.yml 생성 (CI 전용 설정)
-      - name: Create service-api test config
+      # service-api의 application.yml 생성 (CI 테스트용 설정)
+      - name: Create service-api config for CI
         run: |
           mkdir -p service-api/src/main/resources
-          echo "${{ secrets.SERVICE_API_TEST_YML }}" | base64 --decode > service-api/src/main/resources/application-test.yml
+          echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
       # Gradle Build (Test, Sentry 제외)
       - name: Gradle Build (No Tests, No Sentry)
         run: ./gradlew clean build -x test -x sentryBundleSourcesJava
 
-      # Gradle Test (테스트 프로필로 실행)
+      # Gradle Test
       - name: Gradle Test
-        run: SPRING_PROFILES_ACTIVE=test ./gradlew test
+        run: ./gradlew test
 
       # 테스트 리포트 업로드 (실패 시)
       - name: Upload Test Report on Failure
