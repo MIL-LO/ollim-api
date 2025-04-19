@@ -11,27 +11,27 @@ jobs:
       contents: read
 
     services:
-      # PostgreSQL 컨테이너 실행
+      # PostgreSQL 컨테이너 실행 (.env와 동일한 설정으로 일치시킴)
       postgres:
         image: postgres:13
         env:
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_DB: testdb
+          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: >-
-          --health-cmd="pg_isready -U testuser"
+          --health-cmd="pg_isready -U millo"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
-    # .env 변수 누락 시를 대비해 기본값 설정
+    # .env 변수 누락 시를 대비해 기본값 설정 (.env와 동일하게 일치시킴)
     env:
-      POSTGRES_URL: jdbc:postgresql://localhost:5432/testdb
-      POSTGRES_USERNAME: testuser
-      POSTGRES_PASSWORD: testpass
-      SENTRY_DSN: ""  # Sentry가 빈값이어도 오류나지 않도록 기본값 설정
+      POSTGRES_URL: ${{ secrets.POSTGRES_URL }}
+      POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
     steps:
       # GitHub 리포지토리 checkout
