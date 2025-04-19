@@ -11,8 +11,10 @@ jobs:
       contents: read
 
     steps:
+      # GitHub 리포지토리 checkout
       - uses: actions/checkout@v4
 
+      # JDK 17 설정 (Corretto 사용)
       - name: Set up JDK 17 with Corretto
         uses: actions/setup-java@v4
         with:
@@ -20,14 +22,16 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
+      # Gradle 설정
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      # gradlew 실행 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일을 먼저 생성하고 환경 변수를 export
-      # 이후 application.yml 또는 application-private.yml 파일에서 참조할 수 있도록 준비
+      # .env 파일 생성 및 환경 변수 export
+      # 이후 application.yml 등에서 ${}로 참조 가능하게 함
       - name: Load .env and export variables
         run: |
           echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
@@ -35,19 +39,19 @@ jobs:
           source .env
           set +a
 
-      # admin-api의 application-private.yml 파일 생성
+      # admin-api의 application-private.yml 생성
       - name: Create admin-api environment file
         run: |
           mkdir -p admin-api/src/main/resources
           echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
 
-      # app-api의 application-private.yml 파일 생성
+      # app-api의 application-private.yml 생성
       - name: Create app-api environment file
         run: |
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
 
-      # service-api의 application.yml 파일 생성 (CI 테스트용 설정 주입)
+      # service-api의 application.yml 생성 (CI 테스트용 설정)
       - name: Create service-api config for CI
         run: |
           mkdir -p service-api/src/main/resources
@@ -57,6 +61,7 @@ jobs:
       - name: Build and Test with Gradle
         run: ./gradlew clean build
 
+  # 의존성 그래프 제출 (GitHub security dashboard용)
   dependency-submission:
     needs: build-and-test
     runs-on: ubuntu-latest
