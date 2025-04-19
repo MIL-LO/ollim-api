@@ -1,6 +1,6 @@
 spring:
   application:
-    name: app-api
+    name: service-api
 
   profiles:
     active: private
