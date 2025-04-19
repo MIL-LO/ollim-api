@@ -1,10 +1,10 @@
-package com.millo.ollim.app
+package com.millo.ollim.service
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
-class AppApplicationTests {
+class ApplicationTests {
 
     @Test
     fun contextLoads() {
