@@ -18,4 +18,10 @@ interface OAuthService {
      * provider와 인가 코드를 통해 사용자 정보를 반환
      */
     fun getUserInfo(provider: OAuthProvider, code: String): OAuthUserInfo
+
+    /**
+     * 현재 구현체가 해당 provider를 지원하는지 여부 확인
+     */
+    fun supports(provider: OAuthProvider): Boolean
+
 }
