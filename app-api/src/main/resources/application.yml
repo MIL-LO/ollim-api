@@ -8,6 +8,16 @@ spring:
   config:
     import: optional:file:../.env[.properties]
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            scope: ${SCOPE}
+            redirect-uri: ${REDIRECT_URI}
+
   datasource:
     url: ${POSTGRES_URL}
     username: ${POSTGRES_USERNAME}
