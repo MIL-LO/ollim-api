@@ -18,6 +18,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // Spring-Security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+
     // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
@@ -40,11 +43,12 @@ dependencies {
 
     // Sentry
     implementation("io.sentry:sentry-spring-boot-starter:8.3.0") // Sentry 연동
-    implementation("io.sentry:sentry-logback:8.3.0") // Logback 연동
+    implementation("io.sentry:sentry-logback:8.3.0")
 
     // 테스트
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
