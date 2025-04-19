@@ -39,4 +39,11 @@ class GoogleOAuthServiceImpl : OAuthService {
             providerId = "google_123456"
         )
     }
+
+    /**
+     * 현재 구현체가 Google OAuthProvider를 지원하는지 여부
+     */
+    override fun supports(provider: OAuthProvider): Boolean {
+        return provider == OAuthProvider.GOOGLE
+    }
 }
