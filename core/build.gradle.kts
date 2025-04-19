@@ -5,7 +5,8 @@ plugins {
 }
 
 dependencies {
-    // Spring Data JPA
+
+    // JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // Spring Data REST (HAL 자동 노출 및 Repository 어노테이션 사용 시 필요)
@@ -13,6 +14,9 @@ dependencies {
 
     // PostgreSQL
     runtimeOnly("org.postgresql:postgresql")
+
+    // Mongo
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
     // Kotlin 리플렉션
     implementation("org.jetbrains.kotlin:kotlin-reflect")
