@@ -44,9 +44,9 @@ jobs:
           mkdir -p service-api/src/main/resources
           echo "${{ secrets.SERVICE_API_TEST_YML }}" | base64 --decode > service-api/src/main/resources/application-test.yml
 
-      # Gradle Build (Test 제외)
-      - name: Gradle Build (No Tests)
-        run: ./gradlew clean build -x test
+      # Gradle Build (Test, Sentry 제외)
+      - name: Gradle Build (No Tests, No Sentry)
+        run: ./gradlew clean build -x test -x sentryBundleSourcesJava
 
       # Gradle Test (테스트 프로필로 실행)
       - name: Gradle Test
