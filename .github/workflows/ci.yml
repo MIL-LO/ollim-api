@@ -10,8 +10,8 @@ jobs:
     permissions:
       contents: read
 
-    # 테스트용 PostgreSQL 컨테이너 실행
     services:
+      # PostgreSQL 컨테이너 실행
       postgres:
         image: postgres:13
         env:
@@ -26,17 +26,18 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    # .env가 없을 경우를 대비해 PostgreSQL 기본값 지정
+    # .env 변수 누락 시를 대비해 기본값 설정
     env:
       POSTGRES_URL: jdbc:postgresql://localhost:5432/testdb
       POSTGRES_USERNAME: testuser
       POSTGRES_PASSWORD: testpass
+      SENTRY_DSN: ""  # Sentry가 빈값이어도 오류나지 않도록 기본값 설정
 
     steps:
-      # GitHub 리포지토리 코드 체크아웃
+      # GitHub 리포지토리 checkout
       - uses: actions/checkout@v4
 
-      # JDK 17 환경 구성
+      # JDK 17 설정
       - name: Set up JDK 17 with Corretto
         uses: actions/setup-java@v4
         with:
@@ -44,7 +45,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
-      # Gradle CLI 설정
+      # Gradle 설정
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -52,14 +53,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일 decode 및 환경 변수 export
+      # .env 파일 decode 후 export. 실패 시 명확한 로그 출력
       - name: Load .env and export variables
         shell: bash
         run: |
-          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env || (echo ".env decode failed!" && exit 1)
+          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env || (echo "❌ .env decode failed!" && exit 1)
           set -a
-          source .env || (echo ".env export failed!" && exit 1)
+          source .env || (echo "❌ .env export failed!" && exit 1)
           set +a
+
+      # service-api 설정 파일 생성 (.yml 내 sentry.enabled: false 반드시 포함되어야 함)
+      - name: Create service-api config
+        run: |
+          mkdir -p service-api/src/main/resources
+          echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
       # admin-api 설정 파일 생성
       - name: Create admin-api config
@@ -73,12 +80,6 @@ jobs:
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
 
-      # service-api 설정 파일 생성 (CI 테스트용)
-      - name: Create service-api config
-        run: |
-          mkdir -p service-api/src/main/resources
-          echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
-
       # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
         run: ./gradlew clean build
@@ -91,7 +92,6 @@ jobs:
           name: test-report
           path: service-api/build/reports/tests/test
 
-  # 의존성 그래프 GitHub에 제출 (security dashboard 용도)
   dependency-submission:
     needs: build-and-test
     runs-on: ubuntu-latest
