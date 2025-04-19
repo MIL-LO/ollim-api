@@ -10,6 +10,28 @@ jobs:
     permissions:
       contents: read
 
+    services:
+      # PostgreSQL 컨테이너 실행
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U testuser"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    # .env 파일 누락 시를 대비해 기본값 설정 (선택 사항)
+    env:
+      POSTGRES_URL: jdbc:postgresql://localhost:5432/testdb
+      POSTGRES_USERNAME: testuser
+      POSTGRES_PASSWORD: testpass
+
     steps:
       # GitHub 리포지토리 checkout
       - uses: actions/checkout@v4
@@ -33,6 +55,7 @@ jobs:
       # .env 파일 생성 및 환경 변수 export
       # 이후 application.yml 등에서 ${}로 참조 가능하게 함
       - name: Load .env and export variables
+        shell: bash
         run: |
           echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
           set -a
