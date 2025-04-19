@@ -26,39 +26,36 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # admin-api의 application-private.yml 생성
+      # .env 파일을 먼저 생성하고 환경 변수를 export
+      # 이후 application.yml 또는 application-private.yml 파일에서 참조할 수 있도록 준비
+      - name: Load .env and export variables
+        run: |
+          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
+          set -a
+          source .env
+          set +a
+
+      # admin-api의 application-private.yml 파일 생성
       - name: Create admin-api environment file
         run: |
           mkdir -p admin-api/src/main/resources
           echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
 
-      # app-api의 application-private.yml 생성
+      # app-api의 application-private.yml 파일 생성
       - name: Create app-api environment file
         run: |
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
 
-      # service-api의 application.yml 생성 (CI 테스트용 설정)
+      # service-api의 application.yml 파일 생성 (CI 테스트용 설정 주입)
       - name: Create service-api config for CI
         run: |
           mkdir -p service-api/src/main/resources
           echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
-      # Gradle Build (Test, Sentry 제외)
-      - name: Gradle Build (No Tests, No Sentry)
-        run: ./gradlew clean build -x test -x sentryBundleSourcesJava
-
-      # Gradle Test
-      - name: Gradle Test
-        run: ./gradlew test
-
-      # 테스트 리포트 업로드 (실패 시)
-      - name: Upload Test Report on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-report
-          path: service-api/build/reports/tests/test
+      # Gradle 빌드 및 테스트 수행
+      - name: Build and Test with Gradle
+        run: ./gradlew clean build
 
   dependency-submission:
     needs: build-and-test
