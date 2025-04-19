@@ -10,8 +10,8 @@ jobs:
     permissions:
       contents: read
 
+    # 테스트용 PostgreSQL 컨테이너 실행
     services:
-      # PostgreSQL 컨테이너 실행
       postgres:
         image: postgres:13
         env:
@@ -26,17 +26,17 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    # .env 파일 누락 시를 대비해 기본값 설정 (선택 사항)
+    # .env가 없을 경우를 대비해 PostgreSQL 기본값 지정
     env:
       POSTGRES_URL: jdbc:postgresql://localhost:5432/testdb
       POSTGRES_USERNAME: testuser
       POSTGRES_PASSWORD: testpass
 
     steps:
-      # GitHub 리포지토리 checkout
+      # GitHub 리포지토리 코드 체크아웃
       - uses: actions/checkout@v4
 
-      # JDK 17 설정 (Corretto 사용)
+      # JDK 17 환경 구성
       - name: Set up JDK 17 with Corretto
         uses: actions/setup-java@v4
         with:
@@ -44,7 +44,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
-      # Gradle 설정
+      # Gradle CLI 설정
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -52,39 +52,46 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일 생성 및 환경 변수 export
-      # 이후 application.yml 등에서 ${}로 참조 가능하게 함
+      # .env 파일 decode 및 환경 변수 export
       - name: Load .env and export variables
         shell: bash
         run: |
-          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
+          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env || (echo ".env decode failed!" && exit 1)
           set -a
-          source .env
+          source .env || (echo ".env export failed!" && exit 1)
           set +a
 
-      # admin-api의 application-private.yml 생성
-      - name: Create admin-api environment file
+      # admin-api 설정 파일 생성
+      - name: Create admin-api config
         run: |
           mkdir -p admin-api/src/main/resources
           echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
 
-      # app-api의 application-private.yml 생성
-      - name: Create app-api environment file
+      # app-api 설정 파일 생성
+      - name: Create app-api config
         run: |
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
 
-      # service-api의 application.yml 생성 (CI 테스트용 설정)
-      - name: Create service-api config for CI
+      # service-api 설정 파일 생성 (CI 테스트용)
+      - name: Create service-api config
         run: |
           mkdir -p service-api/src/main/resources
           echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
-      # Gradle 빌드 및 테스트 수행
+      # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
         run: ./gradlew clean build
 
-  # 의존성 그래프 제출 (GitHub security dashboard용)
+      # 테스트 실패 시 리포트 업로드
+      - name: Upload Test Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: service-api/build/reports/tests/test
+
+  # 의존성 그래프 GitHub에 제출 (security dashboard 용도)
   dependency-submission:
     needs: build-and-test
     runs-on: ubuntu-latest
