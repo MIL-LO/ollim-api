@@ -37,31 +37,20 @@ jobs:
         run: |
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
-      
-      # service-api의 application.yml (이건 그대로 유지)
-      - name: Create service-api environment file
+
+      # service-api의 application-test.yml 생성 (CI 전용 설정)
+      - name: Create service-api test config
         run: |
           mkdir -p service-api/src/main/resources
-          echo "${{ secrets.SERVICE_API_PRIVATE_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
-
-      # .env 파일 생성
-      - name: Create .env file
-        run: echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
-
-      # .env를 환경 변수로 export
-      - name: Export .env values
-        run: |
-          set -a
-          source .env
-          set +a
+          echo "${{ secrets.SERVICE_API_TEST_YML }}" | base64 --decode > service-api/src/main/resources/application-test.yml
 
       # Gradle Build (Test 제외)
       - name: Gradle Build (No Tests)
         run: ./gradlew clean build -x test
 
-      # Gradle Test
+      # Gradle Test (테스트 프로필로 실행)
       - name: Gradle Test
-        run: ./gradlew test
+        run: SPRING_PROFILES_ACTIVE=test ./gradlew test
 
       # 테스트 리포트 업로드 (실패 시)
       - name: Upload Test Report on Failure
