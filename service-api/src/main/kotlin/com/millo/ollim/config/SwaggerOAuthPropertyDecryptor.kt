@@ -1,4 +1,4 @@
-package com.millo.ollim.app.config
+package com.millo.ollim.config
 
 import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Value

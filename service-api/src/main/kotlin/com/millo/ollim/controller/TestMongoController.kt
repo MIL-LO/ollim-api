@@ -1,4 +1,4 @@
-package com.millo.ollim.app.controller
+package com.millo.ollim.controller
 
 import com.millo.ollim.core.domain.test.TestDocument
 import com.millo.ollim.infrastructure.mongo.TestMongoService
