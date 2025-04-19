@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/redis")
-class RedisController(
+class TestRedisController(
     private val redisService: RedisService
 ) {
     @PostMapping("/save")
