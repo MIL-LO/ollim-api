@@ -68,6 +68,12 @@ jobs:
           mkdir -p service-api/src/main/resources
           echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
+      # service-api 설정 파일 생성 (private 프로필용)
+      - name: Create service-api private config
+        run: |
+          mkdir -p service-api/src/main/resources
+          echo "${{ secrets.SERVICE_API_PRIVATE_YML }}" | base64 --decode > service-api/src/main/resources/application-private.yml
+
       # admin-api 설정 파일 생성
       - name: Create admin-api config
         run: |
