@@ -37,6 +37,12 @@ jobs:
         run: |
           mkdir -p app-api/src/main/resources
           echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
+      
+      # service-api의 application-private.yml 파일 생성
+      - name: Create service-api environment file
+        run: |
+          mkdir -p service-api/src/main/resources
+          echo "${{ secrets.SERVICE_API_PRIVATE_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
 
       # 루트 디렉토리의 .env 파일 생성 (여러 환경 변수들을 포함)
       - name: Create .env file
