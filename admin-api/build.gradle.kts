@@ -21,15 +21,16 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Actuator
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-actuator") // 헬스체크, 메트릭
 
     // Micrometer
-    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-registry-prometheus") // Prometheus 연동
 
     // Sentry
-    implementation("io.sentry:sentry-spring-boot-starter:8.3.0")
-    implementation("io.sentry:sentry-logback:8.3.0")
+    implementation("io.sentry:sentry-spring-boot-starter:8.3.0") // Sentry 연동
+    implementation("io.sentry:sentry-logback:8.3.0") // 로그 수집 연동
 
+    // 테스트
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")

@@ -4,6 +4,7 @@ plugins {
     id("io.sentry.jvm.gradle")
     kotlin("jvm")
     kotlin("plugin.spring")
+    kotlin("plugin.jpa")
 }
 
 dependencies {
@@ -17,6 +18,13 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
+    // JPA
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    // HAL Explorer (JPA 자동 REST 노출)
+    implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.springframework.data:spring-data-rest-hal-explorer")
+
     // Swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
 
@@ -25,14 +33,14 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Actuator
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-actuator") // 헬스체크 및 메트릭
 
     // Micrometer
-    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.micrometer:micrometer-registry-prometheus") // Prometheus 연동
 
     // Sentry
-    implementation("io.sentry:sentry-spring-boot-starter:8.3.0")
-    implementation("io.sentry:sentry-logback:8.3.0")
+    implementation("io.sentry:sentry-spring-boot-starter:8.3.0") // Sentry 연동
+    implementation("io.sentry:sentry-logback:8.3.0") // Logback 연동
 
     // 테스트
     testImplementation("org.springframework.boot:spring-boot-starter-test")

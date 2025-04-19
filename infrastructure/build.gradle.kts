@@ -1,37 +1,33 @@
 plugins {
-	kotlin("jvm")
-	kotlin("plugin.spring")
-	kotlin("plugin.jpa")
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    kotlin("plugin.jpa")
 }
 
 dependencies {
-	implementation(project(":core"))
+    implementation(project(":core"))
 
     // spring-web
-	implementation("org.springframework.boot:spring-boot-starter-web")
-
-    // spring-jpa
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
     // Redis
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
-    // Mongo
-	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+     // Mongo
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
-    // PostgreSQL
-	runtimeOnly("org.postgresql:postgresql")
+    // Kotlin 리플렉션
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-	// Kotlin
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+     // Kotlin 전용 Jackson 직렬화
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	// Tests
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // 테스트
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.named<Jar>("jar") {
-	enabled = true
+    enabled = true
 }
