@@ -42,13 +42,6 @@ jobs:
           docker compose up -d
           echo "⏳ Waiting for services to be ready..."
 
-      # service-api 설정 파일 생성 (.yml 내 sentry.enabled: false 반드시 포함되어야 함)
-      - name: Create service-api config
-        run: |
-          mkdir -p service-api/src/main/resources
-          echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
-          echo "✅ service-api config created"
-
       # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
         run: SPRING_PROFILES_ACTIVE=default JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
