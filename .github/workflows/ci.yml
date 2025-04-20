@@ -33,12 +33,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
-      - name: Start Docker Compose Services
-        run: |
-          docker compose up -d
-          echo "⏳ Waiting for services to be ready..."
-
       # .env 파일 decode 후 export. 실패 시 명확한 로그 출력
       - name: Load .env and export variables
         shell: bash
@@ -47,6 +41,12 @@ jobs:
           set -a
           source .env || (echo "❌ .env export failed!" && exit 1)
           set +a
+      
+      # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
+      - name: Start Docker Compose Services
+        run: |
+          docker compose up -d
+          echo "⏳ Waiting for services to be ready..."
 
       # service-api 설정 파일 생성 (.yml 내 sentry.enabled: false 반드시 포함되어야 함)
       - name: Create service-api config
