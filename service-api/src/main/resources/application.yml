@@ -2,8 +2,12 @@ spring:
   application:
     name: service-api
 
-  profiles:
-    active: private
+server:
+  port: 5001
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
 
   config:
     import: optional:file:../.env[.properties]
