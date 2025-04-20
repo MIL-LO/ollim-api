@@ -10,9 +10,6 @@ jobs:
     permissions:
       contents: read
 
-    env:
-      JASYPT_ENCRYPTOR_PASSWORD: ${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}
-
     steps:
       # GitHub 리포지토리 checkout
       - uses: actions/checkout@v4
@@ -52,21 +49,9 @@ jobs:
           echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
           echo "✅ service-api config created"
 
-      # admin-api 설정 파일 생성
-      - name: Create admin-api config
-        run: |
-          mkdir -p admin-api/src/main/resources
-          echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
-
-      # app-api 설정 파일 생성
-      - name: Create app-api config
-        run: |
-          mkdir -p app-api/src/main/resources
-          echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
-
       # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
-        run: JASYPT_ENCRYPTOR_PASSWORD=${{ env.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
+        run: JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
 
       # 테스트 실패 시 리포트 업로드
       - name: Upload Test Report on Failure
