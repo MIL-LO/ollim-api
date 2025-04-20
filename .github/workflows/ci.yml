@@ -51,7 +51,7 @@ jobs:
 
       # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
-        run: JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
+        run: SPRING_PROFILES_ACTIVE=private JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
 
       # 테스트 실패 시 리포트 업로드
       - name: Upload Test Report on Failure
