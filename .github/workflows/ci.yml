@@ -10,28 +10,8 @@ jobs:
     permissions:
       contents: read
 
-    services:
-      # PostgreSQL 컨테이너 실행 (.env와 동일한 설정으로 일치시킴)
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U millo"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    # .env 변수 누락 시를 대비해 기본값 설정 (.env와 동일하게 일치시킴)
     env:
       JASYPT_ENCRYPTOR_PASSWORD: ${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}
-      POSTGRES_USERNAME: ${{ secrets.POSTGRES_USERNAME }}
-      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-      POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
     steps:
       # GitHub 리포지토리 checkout
@@ -53,6 +33,14 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
+      - name: Start Docker Compose Services
+        run: |
+          docker compose -f docker-compose.yml up -d
+          echo "⏳ Waiting for services to be ready..."
+          sleep 15
+          docker compose ps
+
       # .env 파일 decode 후 export. 실패 시 명확한 로그 출력
       - name: Load .env and export variables
         shell: bash
@@ -61,15 +49,6 @@ jobs:
           set -a
           source .env || (echo "❌ .env export failed!" && exit 1)
           set +a
-
-      # PostgreSQL 준비 대기
-      - name: Wait for PostgreSQL to be ready
-        run: |
-          echo "⏳ Waiting for PostgreSQL to be ready..."
-          until pg_isready -h localhost -p 5432 -U "$POSTGRES_USERNAME"; do
-            sleep 2
-          done
-          echo "✅ PostgreSQL is ready."
 
       # service-api 설정 파일 생성 (.yml 내 sentry.enabled: false 반드시 포함되어야 함)
       - name: Create service-api config
