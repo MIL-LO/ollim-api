@@ -4,21 +4,25 @@ import com.millo.ollim.core.auth.domain.OAuthUserInfo
 import com.millo.ollim.core.auth.dto.LoginDTO
 import com.millo.ollim.core.auth.port.AuthService
 import com.millo.ollim.core.auth.port.OAuthService
+import com.millo.ollim.core.auth.port.UserService
+import com.millo.ollim.infrastructure.auth.jwt.JwtTokenProvider
 import org.springframework.stereotype.Service
-import java.util.UUID
+import java.util.*
 
 /**
  * OAuth 기반 로그인 흐름을 처리하는 AuthService 구현체 (Facade 역할)
  */
 @Service
 class AuthServiceImpl(
-    private val oAuthServices: List<OAuthService>
+    private val oAuthServices: List<OAuthService>,
+    private val userService: UserService,
+    private val jwtTokenProvider: JwtTokenProvider
 ) : AuthService {
 
     /**
      * 소셜 로그인 전체 흐름을 처리하는 메서드
      * @param request 로그인 요청 DTO
-     * @return 로그인 결과 응답 DTO
+     * @return 로그인 응답 DTO
      */
     override fun login(request: LoginDTO.Request): LoginDTO.Response {
         // provider에 해당하는 OAuthService 찾기
@@ -31,15 +35,18 @@ class AuthServiceImpl(
         // AccessToken으로 사용자 정보 조회
         val userInfo: OAuthUserInfo = oAuthService.getUserInfo(request.provider, accessToken)
 
-        // 사용자 DB 등록 또는 조회 (임시 UUID 사용)
-        val isNewUser = true // TODO: 실제 유저 DB 조회 및 저장 로직 필요
-        val userId = UUID.randomUUID() // TODO: 실제 저장된 UUID로 대체
-        val role = "USER" // TODO: 실제 역할 반환
+        // 사용자 등록 또는 조회
+        val userResult = userService.createOrFindUser(request.provider, userInfo)
+        val userId = userResult.id
+        val isNewUser = userResult.isNew
+        val role = "USER" // TODO: 추후 역할 분리 시 enum으로 대체
         val nickname = userInfo.nickname
 
         // JWT 토큰 생성
-        val jwtAccessToken = "access.jwt.token" // TODO: JWT 발급 로직 필요
-        val jwtRefreshToken = "refresh.jwt.token" // TODO: RefreshToken 발급 후 Redis 저장 필요
+        val jwtAccessToken = jwtTokenProvider.createAccessToken(userId, role)
+        val jwtRefreshToken = jwtTokenProvider.createRefreshToken(userId, role)
+
+        // TODO: RefreshToken Redis 저장 로직 추가 예정
 
         return LoginDTO.Response(
             accessToken = jwtAccessToken,

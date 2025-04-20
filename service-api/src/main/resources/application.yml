@@ -84,3 +84,8 @@ sentry:
   environment: ${spring.profiles.active:default}
   send-default-pii: true
   traces-sample-rate: 1.0
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRED}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRED}
