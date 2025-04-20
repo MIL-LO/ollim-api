@@ -10,9 +10,6 @@ jobs:
     permissions:
       contents: read
 
-    env:
-      JASYPT_ENCRYPTOR_PASSWORD: ${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }}
-
     steps:
       # GitHub 리포지토리 checkout
       - uses: actions/checkout@v4
@@ -33,40 +30,31 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일 생성 (.env 안의 DB 설정은 CI용 값으로 되어 있어야 함)
-      - name: Create .env file
+      # .env 파일 생성 및 PostgreSQL 주소를 localhost로 패치
+      - name: Create .env file for CI
         run: |
           echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
-          echo "✅ .env file created"
-      
+          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
+          echo "✅ .env file created and patched for localhost DB"
+
       # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
       - name: Start Docker Compose Services
         run: |
           docker compose up -d
-          echo "⏳ Waiting for services to be ready..."
+          echo "⏳ Waiting for containers to be healthy..."
 
-      # service-api 설정 파일 생성 (.yml 내 sentry.enabled: false 반드시 포함되어야 함)
-      - name: Create service-api config
+      # PostgreSQL이 준비될 때까지 대기
+      - name: Wait for PostgreSQL to be ready
         run: |
-          mkdir -p service-api/src/main/resources
-          echo "${{ secrets.SERVICE_API_YML }}" | base64 --decode > service-api/src/main/resources/application.yml
-          echo "✅ service-api config created"
+          for i in {1..10}; do
+            docker exec $(docker ps -qf "name=postgres") pg_isready -U millo && break
+            echo "⏳ Waiting for postgres..."
+            sleep 3
+          done
 
-      # admin-api 설정 파일 생성
-      - name: Create admin-api config
-        run: |
-          mkdir -p admin-api/src/main/resources
-          echo "${{ secrets.ADMIN_API_PRIVATE_YML }}" | base64 --decode > admin-api/src/main/resources/application-private.yml
-
-      # app-api 설정 파일 생성
-      - name: Create app-api config
-        run: |
-          mkdir -p app-api/src/main/resources
-          echo "${{ secrets.APP_API_PRIVATE_YML }}" | base64 --decode > app-api/src/main/resources/application-private.yml
-
-      # Gradle 빌드 및 테스트 실행
+      # Gradle 빌드 및 테스트 실행 (default profile 및 JASYPT 비밀번호 전달)
       - name: Build and Test with Gradle
-        run: JASYPT_ENCRYPTOR_PASSWORD=${{ env.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
+        run: SPRING_PROFILES_ACTIVE=default JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
 
       # 테스트 실패 시 리포트 업로드
       - name: Upload Test Report on Failure

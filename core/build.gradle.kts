@@ -14,6 +14,7 @@ dependencies {
 
     // PostgreSQL
     runtimeOnly("org.postgresql:postgresql")
+    testRuntimeOnly("org.postgresql:postgresql")
 
     // Mongo
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
