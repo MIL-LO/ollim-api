@@ -1,6 +1,7 @@
 package com.millo.ollim.core.auth.dto
 
 import com.millo.ollim.core.auth.domain.OAuthProvider
+import java.util.UUID
 
 /**
  * 소셜 로그인 Request, Response DTO 클래스
@@ -30,7 +31,7 @@ object LoginDTO {
         val accessToken: String,
         val refreshToken: String,
         val isNewUser: Boolean,
-        val userId: Long,
+        val userId: UUID,
         val role: String,
         val nickname: String
     )
