@@ -1,13 +1,9 @@
-spring:
-  application:
-    name: service-api
-
 server:
   port: 5000
 
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+spring:
+  application:
+    name: service-api
 
   config:
     import: optional:file:../.env[.properties]
@@ -47,6 +43,10 @@ jasypt:
       password: ${MONGO_PASSWORD}
       database: ${MONGO_DATABASE}
       authentication-database: ${AUTHENTICATION_DATABASE}
+
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
 
 database:
   redis:
