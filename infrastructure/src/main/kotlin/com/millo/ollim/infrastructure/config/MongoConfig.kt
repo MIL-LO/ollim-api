@@ -15,15 +15,16 @@ class MongoConfig(
     @Value("\${spring.data.mongodb.port}") private val port: Int,
     @Value("\${spring.data.mongodb.username}") private val username: String,
     @Value("\${spring.data.mongodb.password}") private val password: String,
-    @Value("\${spring.data.mongodb.database}") private val database: String
+    @Value("\${spring.data.mongodb.database}") private val database: String,
+    @Value("\${spring.data.mongodb.authentication-database}") private val authDatabase: String
 ) {
 
     @Bean
     fun mongoClient(): MongoClient {
-        val connectionString = "mongodb://$username:$password@$host:$port/$database"
+        val connectionString =
+            "mongodb://$username:$password@$host:$port/$database?authSource=$authDatabase"
         return MongoClients.create(connectionString)
     }
-
     @Bean
     fun mongoTemplate(): MongoTemplate {
         return MongoTemplate(mongoClient(), database)

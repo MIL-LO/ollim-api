@@ -1,0 +1,84 @@
+name: CI with Gradle
+
+on:
+  pull_request:
+    branches: [ "dev", "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # GitHub 리포지토리 checkout
+      - uses: actions/checkout@v4
+
+      # JDK 17 설정
+      - name: Set up JDK 17 with Corretto
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      # Gradle 설정
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # gradlew 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # .env 파일 생성 및 PostgreSQL 주소를 localhost로 패치
+      - name: Create .env file for CI
+        run: |
+          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
+          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
+          echo "✅ .env file created and patched for localhost DB"
+
+      # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
+      - name: Start Docker Compose Services
+        run: |
+          docker compose up -d
+          echo "⏳ Waiting for containers to be healthy..."
+
+      # PostgreSQL이 준비될 때까지 대기
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..10}; do
+            docker exec $(docker ps -qf "name=postgres") pg_isready -U millo && break
+            echo "⏳ Waiting for postgres..."
+            sleep 3
+          done
+
+      # Gradle 빌드 및 테스트 실행 (default profile 및 JASYPT 비밀번호 전달)
+      - name: Build and Test with Gradle
+        run: SPRING_PROFILES_ACTIVE=default JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
+
+      # 테스트 실패 시 리포트 업로드
+      - name: Upload Test Report on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: service-api/build/reports/tests/test
+
+  dependency-submission:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17 with Corretto for dependency submission
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+          cache: 'gradle'
+
+      - name: Generate and submit dependency graph
+        uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5
