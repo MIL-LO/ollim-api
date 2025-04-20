@@ -36,10 +36,8 @@ jobs:
       # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
       - name: Start Docker Compose Services
         run: |
-          docker compose -f docker-compose.yml up -d
+          docker compose up -d
           echo "⏳ Waiting for services to be ready..."
-          sleep 15
-          docker compose ps
 
       # .env 파일 decode 후 export. 실패 시 명확한 로그 출력
       - name: Load .env and export variables
