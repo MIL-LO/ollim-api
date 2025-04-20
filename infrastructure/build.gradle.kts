@@ -25,6 +25,11 @@ dependencies {
      // Kotlin 전용 Jackson 직렬화
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    // JWT
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
     // 테스트
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
