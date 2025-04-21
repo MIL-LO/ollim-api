@@ -1,27 +1,27 @@
-package com.millo.ollim.infrastructure.mongo
+package com.millo.ollim.health.service
 
-import com.millo.ollim.core.domain.test.TestDocument
-import com.millo.ollim.core.domain.test.TestDocumentRepository
+import com.millo.ollim.health.domain.DummyDocument
+import com.millo.ollim.health.repository.DummyDocumentRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TestMongoService(
-    private val testDocumentRepository: TestDocumentRepository
+class MongoService(
+    private val testDocumentRepository: DummyDocumentRepository
 ) {
     @Transactional
-    fun saveTestData(): TestDocument {
-        val document = TestDocument(message = "hello(Mongo)")
+    fun saveTestData(): DummyDocument {
+        val document = DummyDocument(message = "hello(Mongo)")
         return testDocumentRepository.save(document)
     }
 
     @Transactional(readOnly = true)
-    fun getAllTestData(): List<TestDocument> {
+    fun getAllTestData(): List<DummyDocument> {
         return testDocumentRepository.findAll()
     }
 
     @Transactional
-    fun deleteTestData(id: String): TestDocument {
+    fun deleteTestData(id: String): DummyDocument {
         val document = testDocumentRepository.findById(id)
             .orElseThrow { NoSuchElementException("해당 ID의 문서를 찾을 수 없습니다: $id") }
 

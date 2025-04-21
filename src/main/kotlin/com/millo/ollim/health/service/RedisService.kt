@@ -1,4 +1,4 @@
-package com.millo.ollim.infrastructure.redis
+package com.millo.ollim.health.service
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
