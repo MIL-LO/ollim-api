@@ -1,4 +1,4 @@
-package com.millo.ollim.core.config
+package com.millo.ollim.common.config
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties
 import org.jasypt.encryption.StringEncryptor

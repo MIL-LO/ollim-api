@@ -1,4 +1,4 @@
-package com.millo.ollim.infrastructure.config
+package com.millo.ollim.common.config
 
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
