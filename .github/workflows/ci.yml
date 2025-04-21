@@ -30,8 +30,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일 생성 및 PostgreSQL 주소를 localhost로 패치
-      - name: Create .env file for CI
+      # .env.local 파일 생성 및 PostgreSQL 주소를 localhost로 패치
+      - name: Create .env.local file for CI
         run: |
           echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
           sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
