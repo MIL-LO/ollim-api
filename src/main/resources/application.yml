@@ -8,7 +8,7 @@ spring:
   config:
     import: optional:file:.env[.properties]
 
-
+spring
   security:
     oauth2:
       client:
@@ -90,3 +90,11 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRED}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRED}
+
+oauth:
+  google:
+    client-id: ${CLIENT_ID}
+    client-secret: ${CLIENT_SECRET}
+    redirect-uri: ${REDIRECT_URI}
+    token-url: https://oauth2.googleapis.com/token
+    user-info-url: https://www.googleapis.com/oauth2/v2/userinfo
