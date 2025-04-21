@@ -1,4 +1,4 @@
-package com.millo.ollim.core.common.enums
+package com.millo.ollim.common.enums
 
 /*
     TODO
