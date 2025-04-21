@@ -3,21 +3,10 @@ server:
 
 spring:
   application:
-    name: service-api
+    name: ollim-api
 
   config:
-    import: optional:file:.env[.properties]
-
-spring
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
-            scope: ${SCOPE}
-            redirect-uri: ${REDIRECT_URI}
+    import: optional:file:.env.local[.properties]
 
   datasource:
     url: ${POSTGRES_URL}
