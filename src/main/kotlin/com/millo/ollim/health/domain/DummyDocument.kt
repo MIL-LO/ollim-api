@@ -1,9 +1,9 @@
-package com.millo.ollim.core.domain.test
+package com.millo.ollim.health.domain
 
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document(collection = "test_documents")
-data class TestDocument(
+data class DummyDocument(
     val id: String? = null,
     val message: String
 )
