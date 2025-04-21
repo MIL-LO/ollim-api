@@ -6,7 +6,7 @@ spring:
     name: service-api
 
   config:
-    import: optional:file:.env[.properties]
+    import: optional:file:.env.local[.properties]
 
 
   security:
