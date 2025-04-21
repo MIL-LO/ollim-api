@@ -1,11 +1,11 @@
-package com.millo.ollim.controller
+package com.millo.ollim.health.controller
 
-import com.millo.ollim.infrastructure.redis.RedisService
+import com.millo.ollim.health.service.RedisService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/redis")
-class TestRedisController(
+class RedisHealthController(
     private val redisService: RedisService
 ) {
     @PostMapping("/save")
