@@ -32,13 +32,12 @@ dependencies {
 //    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
-    implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     // PostgreSQL
     runtimeOnly("org.postgresql:postgresql")
 
     // Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
