@@ -6,7 +6,7 @@ spring:
     name: ollim-api
 
   config:
-    import: optional:file:.env.local[.properties]
+    import: optional:file:${ENV_FILE:.env.local}[.properties]
 
   datasource:
     url: ${POSTGRES_URL}
@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -87,3 +87,10 @@ oauth:
     redirect-uri: ${REDIRECT_URI}
     token-url: https://oauth2.googleapis.com/token
     user-info-url: https://www.googleapis.com/oauth2/v2/userinfo
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    token-url: https://appleid.apple.com/auth/token
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    private-key: ${APPLE_PRIVATE_KEY}
+    issuer: ${APPLE_ISSUER}
