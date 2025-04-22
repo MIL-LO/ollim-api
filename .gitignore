@@ -1,6 +1,7 @@
 ### CUSTOM ###
 application-private.yml
-.env
+.env.local
+.env.docker
 
 HELP.md
 .gradle

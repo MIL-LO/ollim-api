@@ -30,17 +30,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env 파일 생성 및 PostgreSQL 주소를 localhost로 패치
-      - name: Create .env file for CI
+      # .env.local 파일 생성 및 PostgreSQL 주소를 localhost로 패치
+      - name: Create .env.local file for CI
         run: |
-          echo "${{ secrets.ENV_FILE }}" | base64 --decode > .env
-          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
-          echo "✅ .env file created and patched for localhost DB"
+          echo "${{ secrets.ENV_LOCAL }}" | base64 --decode > .env.local
+          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env.local
+          echo "✅ .env.local file created and patched for localhost DB"
+      
+      # .env.docker 파일 생성 (docker-compose용 환경변수)
+      - name: Create .env.docker file for docker compose
+        run: |
+          echo "${{ secrets.ENV_DOCKER }}" | base64 --decode > .env.docker
+          echo "✅ .env.docker file created for docker compose"
 
-      # Docker Compose 실행 (PostgreSQL, Redis, Mongo 포함)
+      # Docker Compose 실행
       - name: Start Docker Compose Services
         run: |
-          docker compose up -d
+          docker compose --env-file .env.docker up -d
           echo "⏳ Waiting for containers to be healthy..."
 
       # PostgreSQL이 준비될 때까지 대기
@@ -52,9 +58,9 @@ jobs:
             sleep 3
           done
 
-      # Gradle 빌드 및 테스트 실행 (default profile 및 JASYPT 비밀번호 전달)
+      # Gradle 빌드 및 테스트 실행
       - name: Build and Test with Gradle
-        run: SPRING_PROFILES_ACTIVE=default JASYPT_ENCRYPTOR_PASSWORD=${{ secrets.JASYPT_ENCRYPTOR_PASSWORD }} ./gradlew clean build
+        run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} ./gradlew clean build
 
       # 테스트 실패 시 리포트 업로드
       - name: Upload Test Report on Failure
