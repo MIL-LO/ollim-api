@@ -51,6 +51,7 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - backend
 
@@ -63,12 +64,14 @@ services:
       - "9090:9090"
     networks:
       - monitoring
+      - backend
 
   grafana:
     container_name: grafana
     image: grafana/grafana:latest
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_ROOT_URL=https://api.millo-ollim.com/grafana
     ports:
       - "3000:3000"
     volumes:
