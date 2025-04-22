@@ -33,7 +33,7 @@ jobs:
       # .env.local 파일 생성 및 PostgreSQL 주소를 localhost로 패치
       - name: Create .env.local file for CI
         run: |
-          echo "${{ secrets.ENV_LOCAL }}" | base64 --decode > .env
+          echo "${{ secrets.ENV_LOCAL }}" | base64 --decode > .env.local
           sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
           echo "✅ .env file created and patched for localhost DB"
       
