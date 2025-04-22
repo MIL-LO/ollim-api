@@ -29,33 +29,33 @@ class GoogleOAuthClient(
     /**
      * Google OAuth 인증 코드로 access token 획득
      */
-fun getAccessToken(code: String): String {
-    log.info("Token 요청: code={}, redirect_uri={}, client_id={}, client_secret={}", code, redirectUri, clientId, clientSecret)
-    log.info("Google OAuth 토큰 요청 시작")
-    log.debug("code=$code, redirectUri=$redirectUri")
+    fun getAccessToken(code: String): String {
+        log.info("Token 요청: code={}, redirect_uri={}, client_id={}, client_secret={}", code, redirectUri, clientId, clientSecret)
+        log.info("Google OAuth 토큰 요청 시작")
+        log.debug("code=$code, redirectUri=$redirectUri")
 
-    val response = webClient.post()
-        .uri(tokenUrl)
-        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        .body(
-            BodyInserters.fromFormData("code", code)
-                .with("client_id", clientId)
-                .with("client_secret", clientSecret)
-                .with("redirect_uri", redirectUri)
-                .with("grant_type", "authorization_code")
-        )
-        .retrieve()
-        .onStatus({ it.isError }) { clientResponse ->
-            clientResponse.bodyToMono(String::class.java).flatMap { errorBody ->
-                log.error("Google 토큰 요청 실패: $errorBody")
-                Mono.error(IllegalStateException("Google 토큰 요청 실패: $errorBody"))
+        val response = webClient.post()
+            .uri(tokenUrl)
+            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+            .body(
+                BodyInserters.fromFormData("code", code)
+                    .with("client_id", clientId)
+                    .with("client_secret", clientSecret)
+                    .with("redirect_uri", redirectUri)
+                    .with("grant_type", "authorization_code")
+            )
+            .retrieve()
+            .onStatus({ it.isError }) { clientResponse ->
+                clientResponse.bodyToMono(String::class.java).flatMap { errorBody ->
+                    log.error("Google 토큰 요청 실패: $errorBody")
+                    Mono.error(IllegalStateException("Google 토큰 요청 실패: $errorBody"))
+                }
             }
-        }
-        .bodyToMono(GoogleTokenResponse::class.java)
-        .block() ?: throw IllegalStateException("Google 토큰 응답이 null입니다.")
+            .bodyToMono(GoogleTokenResponse::class.java)
+            .block() ?: throw IllegalStateException("Google 토큰 응답이 null입니다.")
 
-    return response.accessToken // ✅ accessToken 필드만 반환
-}
+        return response.accessToken
+    }
 
     /**
      * access token으로 Google 사용자 정보 조회
@@ -76,6 +76,7 @@ fun getAccessToken(code: String): String {
             .bodyToMono(GoogleUserResponse::class.java)
             .block() ?: throw IllegalStateException("Google 사용자 정보 응답이 null입니다.")
 
+        // OAuthUserInfo로 변환 후 반환
         return OAuthUserInfo(
             email = response.email,
             name = response.name,

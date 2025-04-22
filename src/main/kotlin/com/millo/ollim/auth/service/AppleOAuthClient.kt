@@ -65,6 +65,8 @@ class AppleOAuthClient(
      */
     fun getUserInfo(idToken: String): OAuthUserInfo {
         val claims = jwtGenerator.decodeIdToken(idToken)
+
+        // Apple의 사용자 정보를 OAuthUserInfo로 변환
         return OAuthUserInfo(
             email = claims["email"] as String,
             name = claims["name"] as? String,
