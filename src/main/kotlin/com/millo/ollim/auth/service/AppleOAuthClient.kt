@@ -1,30 +1,32 @@
 package com.millo.ollim.auth.service
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.millo.ollim.auth.dto.OAuthUserInfo
 import com.millo.ollim.user.domain.ProviderType
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyInserters
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 
 /**
  * Apple OAuth 연동을 위한 외부 API 호출 클라이언트
  */
 @Component
 class AppleOAuthClient(
-    private val webClient: WebClient,
     private val jwtGenerator: AppleJwtGenerator,
     @Value("\${oauth.apple.client-id}") private val clientId: String,
     @Value("\${oauth.apple.team-id}") private val teamId: String,
     @Value("\${oauth.apple.key-id}") private val keyId: String,
-    @Value("\${oauth.apple.token-url}") private val tokenUrl: String,
+    @Value("\${oauth.apple.token-url}") private val tokenUrl: String
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
+
+    private val objectMapper = ObjectMapper()
 
     /**
      * 인증 코드로 access token 요청
@@ -38,26 +40,19 @@ class AppleOAuthClient(
 
         log.info("Apple OAuth 토큰 요청 시작")
 
-        val response = webClient.post()
-            .uri(tokenUrl)
-            .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-            .body(
-                BodyInserters.fromFormData("client_id", clientId)
-                    .with("client_secret", clientSecret)
-                    .with("code", code)
-                    .with("grant_type", "authorization_code")
-            )
-            .retrieve()
-            .onStatus({ it.isError }) { clientResponse ->
-                clientResponse.bodyToMono(String::class.java).flatMap { errorBody ->
-                    log.error("Apple 토큰 요청 실패: $errorBody")
-                    Mono.error(IllegalStateException("Apple 토큰 요청 실패: $errorBody"))
-                }
-            }
-            .bodyToMono(AppleTokenResponse::class.java)
-            .block() ?: throw IllegalStateException("Apple 토큰 응답이 null입니다.")
+        val url = URL(tokenUrl)
+        val connection = url.openConnection() as HttpURLConnection
+        connection.requestMethod = "POST"
+        connection.setRequestProperty("Content-Type", MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+        connection.doOutput = true
 
-        return response.idToken
+        val body = "client_id=$clientId&client_secret=$clientSecret&code=$code&grant_type=authorization_code"
+        connection.outputStream.write(body.toByteArray())
+
+        val response = InputStreamReader(connection.inputStream).readText()
+
+        val tokenResponse = objectMapper.readValue(response, AppleTokenResponse::class.java)
+        return tokenResponse.idToken
     }
 
     /**
@@ -78,6 +73,7 @@ class AppleOAuthClient(
     /**
      * Apple 토큰 응답 DTO
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     data class AppleTokenResponse(
         @JsonProperty("access_token") val accessToken: String,
         @JsonProperty("expires_in") val expiresIn: Int,
