@@ -9,6 +9,6 @@ import com.millo.ollim.user.domain.ProviderType
 data class OAuthUserInfo(
     val email: String,
     val name: String?,
-    val provider: ProviderType?,
+    val provider: ProviderType,
     val oauthId: String
 )
