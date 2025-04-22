@@ -36,4 +36,16 @@ class AuthController(
         val response = authService.loginWithGoogle(request)
         return ResponseEntity.ok(response)
     }
+
+    /**
+     * Apple OAuth 로그인 처리
+     * AccessToken, RefreshToken 반환
+     */
+    @PostMapping("/apple/login")
+    fun loginWithApple(
+        @RequestBody request: AuthDTO.OAuthLoginRequest
+    ): ResponseEntity<AuthDTO.OAuthLoginResponse> {
+        val response = authService.loginWithApple(request)
+        return ResponseEntity.ok(response)
+    }
 }
