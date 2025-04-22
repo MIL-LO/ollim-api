@@ -34,7 +34,7 @@ jobs:
       - name: Create .env.local file for CI
         run: |
           echo "${{ secrets.ENV_LOCAL }}" | base64 --decode > .env.local
-          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env
+          sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env.local
           echo "✅ .env file created and patched for localhost DB"
       
       # .env.docker 파일 생성 (docker-compose용 환경변수)
