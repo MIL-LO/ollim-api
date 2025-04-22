@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AuthServiceImpl(
     private val googleOAuthClient: GoogleOAuthClient,
+    private val appleOAuthClient: AppleOAuthClient,
     private val userRepository: UserRepository,
     private val userOAuthRepository: UserOAuthRepository,
     @Value("\${oauth.google.client-id}") private val clientId: String,
@@ -56,6 +57,30 @@ class AuthServiceImpl(
             ?: saveNewUser(userInfo)
 
         // TODO: JWT 토큰 발급 로직으로 대체
+        val fakeAccessToken = "access-token-${user.id}"
+        val fakeRefreshToken = "refresh-token-${user.id}"
+
+        return AuthDTO.OAuthLoginResponse(
+            accessToken = fakeAccessToken,
+            refreshToken = fakeRefreshToken
+        )
+    }
+
+    /**
+     * Apple OAuth 로그인 처리
+     * - code로 id_token 요청
+     * - id_token(JWT)에서 사용자 정보 디코딩
+     * - 기존 회원 여부 확인 후 저장 또는 조회
+     */
+    @Transactional
+    override fun loginWithApple(request: AuthDTO.OAuthLoginRequest): AuthDTO.OAuthLoginResponse {
+        val idToken = appleOAuthClient.getAccessToken(request.code)
+        val userInfo = appleOAuthClient.getUserInfo(idToken)
+
+        val user = userOAuthRepository.findByProviderAndOauthId(ProviderType.APPLE, userInfo.oauthId)
+            ?.user
+            ?: saveNewUser(userInfo)
+
         val fakeAccessToken = "access-token-${user.id}"
         val fakeRefreshToken = "refresh-token-${user.id}"
 

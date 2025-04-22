@@ -16,4 +16,9 @@ interface AuthService {
      * Google OAuth 로그인 처리
      */
     fun loginWithGoogle(request: AuthDTO.OAuthLoginRequest): AuthDTO.OAuthLoginResponse
+
+    /**
+     * Apple OAuth 로그인 처리
+     */
+    fun loginWithApple(request: AuthDTO.OAuthLoginRequest): AuthDTO.OAuthLoginResponse
 }
