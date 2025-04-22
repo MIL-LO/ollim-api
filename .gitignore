@@ -1,7 +1,8 @@
 ### CUSTOM ###
 application-private.yml
-.env.local
-.env.docker
+.env.*
+init-mongo.js
+*.p8
 
 HELP.md
 .gradle

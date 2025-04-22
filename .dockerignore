@@ -12,3 +12,5 @@
 
 .git/
 .gitignore
+
+*.p8
