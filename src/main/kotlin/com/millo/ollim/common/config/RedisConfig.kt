@@ -13,10 +13,10 @@ class RedisConfig {
 
     @Bean
     fun redisConnectionFactory(
-        @Value("\${database.redis.host}") host: String,
-        @Value("\${database.redis.port}") port: Int,
-        @Value("\${database.redis.password:}") password: String,
-        @Value("\${database.redis.database:0}") database: Int
+        @Value("\${spring.data.redis.host}") host: String,
+        @Value("\${spring.data.redis.port}") port: Int,
+        @Value("\${spring.data.redis.password:}") password: String,
+        @Value("\${spring.data.redis.database:0}") database: Int
     ): LettuceConnectionFactory {
         val config = RedisStandaloneConfiguration(host, port).apply {
             this.database = database
