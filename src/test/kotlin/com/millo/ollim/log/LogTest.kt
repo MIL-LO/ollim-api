@@ -31,22 +31,27 @@ class LogTest {
         // then
         val printLog = output.out
 
-        kotlin.test.assertEquals(expectResult, result)
+        assertEquals(expectResult, result)
         assertTrue(printLog.contains("After getSuccess(${input})"))
         assertTrue(printLog.contains("Before getSuccess(${input})"))
+        assertTrue(printLog.contains("Around endTime"))
     }
 
     @Test
     fun getFail(output: CapturedOutput) {
+
         // given
         val input = "test"
 
+        // when
         val exception = Assertions.assertThrows(RuntimeException::class.java) {
             service.getFailure(input)
         }
 
+        //then
         val printLog = output.out
         assertEquals(exception.message, "Failure: ${input}")
+        assertTrue(printLog.contains("Before getFailure(${input})"))
         assertTrue(printLog.contains("After Throwing getFailure(${input})"))
     }
 
