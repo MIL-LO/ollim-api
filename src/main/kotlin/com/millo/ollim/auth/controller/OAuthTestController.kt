@@ -1,17 +1,30 @@
 package com.millo.ollim.auth.controller
 
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RestController
+import com.millo.ollim.auth.dto.AppleUserInfo
+import com.millo.ollim.auth.mapper.toUserInfo
+import com.millo.ollim.auth.util.AppleIdTokenParser
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
-class OAuthTestController {
+@RequestMapping("/auth")
+class OAuthTestController(
+    private val appleIdTokenParser: AppleIdTokenParser
+) {
+    /**
+     * Apple id_token 디코딩 후 AppleUserInfo 반환
+     */
+    @PostMapping("/decode-id-token")
+    fun decodeIdToken(@RequestBody token: String): ResponseEntity<AppleUserInfo> {
+        val payload = appleIdTokenParser.parse(token)
+        return ResponseEntity.ok(payload.toUserInfo())
+    }
 
     /**
-     * Google OAuth 성공 후 리다이렉트될 임시 확인용 엔드포인트
+     * OAuth 성공 페이지 (임시)
      */
-    @GetMapping("/auth/oauth-success")
+    @GetMapping("/oauth-success")
     fun oauthSuccess(): ResponseEntity<String> {
-        return ResponseEntity.ok("Google OAuth 로그인 성공")
+        return ResponseEntity.ok("OAuth 로그인 성공")
     }
 }
