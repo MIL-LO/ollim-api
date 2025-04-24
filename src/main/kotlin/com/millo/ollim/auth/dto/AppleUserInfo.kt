@@ -1,9 +1,17 @@
 package com.millo.ollim.auth.dto
 
+import OAuthUserInfo
+
 /**
- * Apple OAuth 로그인 시 반환되는 id_token의 정보를 매핑한 사용자 정보 DTO
+ * Apple OAuth2 사용자 정보 DTO
  */
 data class AppleUserInfo(
-    val sub: String,       // 고유 사용자 식별자
-    val email: String      // Apple 계정 이메일
-)
+    private val sub: String,
+    private val email: String,
+    private val name: String? = null
+) : OAuthUserInfo {
+    override fun getProvider(): String = "apple"
+    override fun getProviderId(): String = sub
+    override fun getEmail(): String = email
+    override fun getName(): String = name ?: "AppleUser"
+}
