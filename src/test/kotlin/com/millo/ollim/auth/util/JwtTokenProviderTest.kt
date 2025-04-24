@@ -1,6 +1,6 @@
 package com.millo.ollim.auth.util
 
-import com.millo.ollim.auth.util.JwtTokenProvider
+import com.millo.ollim.common.util.JwtTokenProvider
 import com.millo.ollim.user.domain.UserRole
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe

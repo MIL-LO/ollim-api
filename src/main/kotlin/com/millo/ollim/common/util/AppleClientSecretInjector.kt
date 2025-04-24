@@ -1,4 +1,4 @@
-package com.millo.ollim.auth.util
+package com.millo.ollim.common.util
 
 import jakarta.annotation.PostConstruct
 import org.springframework.context.annotation.Configuration

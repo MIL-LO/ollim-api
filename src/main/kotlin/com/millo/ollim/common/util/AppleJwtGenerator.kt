@@ -1,4 +1,4 @@
-package com.millo.ollim.auth.util
+package com.millo.ollim.common.util
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm

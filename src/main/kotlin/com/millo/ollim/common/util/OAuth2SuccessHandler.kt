@@ -1,7 +1,7 @@
 package com.millo.ollim.common.util
 
 import com.millo.ollim.auth.domain.UserPrincipal
-import com.millo.ollim.auth.util.JwtTokenProvider
+import com.millo.ollim.common.util.JwtTokenProvider
 import com.millo.ollim.user.domain.UserRole
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
