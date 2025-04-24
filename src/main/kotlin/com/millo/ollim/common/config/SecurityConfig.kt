@@ -11,7 +11,7 @@ import org.springframework.security.web.SecurityFilterChain
  */
 @Configuration
 class SecurityConfig(
-    private val customOidcUserService: CustomOidcUserService    // 구글처리
+    private val customOidcUserService: CustomOidcUserService
 ) {
 
     @Bean
@@ -19,14 +19,14 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/oauth2/**").permitAll()
+                it.requestMatchers("/**").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login { oauth2 ->
                 oauth2
                     .userInfoEndpoint { endpoint ->
                         endpoint
-                            .oidcUserService(customOidcUserService) // OIDCUserService도 등록
+                            .oidcUserService(customOidcUserService) // OIDCUserService 등록
                     }
                     .defaultSuccessUrl("/", true)
             }
