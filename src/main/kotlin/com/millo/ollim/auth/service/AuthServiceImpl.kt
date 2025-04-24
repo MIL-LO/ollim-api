@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 /**
- * AuthServiceImpl
+ * OAuth 로그인 시 사용자 정보 저장 ServiceImpl
  */
 @Service
 class AuthServiceImpl(
@@ -21,16 +21,16 @@ class AuthServiceImpl(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional
-    override fun saveOrUpdateUser(userInfo: OAuthUserInfo) {
+    override fun saveOrUpdateUser(userInfo: OAuthUserInfo): UserEntity {
         val providerType = ProviderType.valueOf(userInfo.getProvider().uppercase())
 
         log.info(">>> 사용자 이메일로 회원 존재 여부 확인 시작: email={}", userInfo.getEmail())
         val existingUser = userRepository.findByEmail(userInfo.getEmail())
 
-        // 기존 회원이면 종료
+        // 기존 회원이면 마지막 로그인 시간 업데이트 후 반환
         if (existingUser != null) {
-            log.info(">>> 기존 사용자 로그인: {}", existingUser.email)
-            return
+            existingUser.lastLoginAt = LocalDateTime.now()
+            return userRepository.save(existingUser)
         }
 
         // 신규 유저 + 프로필 Cascade 저장
@@ -61,6 +61,8 @@ class AuthServiceImpl(
             )
         )
         log.info(">>> OAuth 연동 저장 완료")
+
+        return newUser
     }
 
     private fun generateDefaultNickname(userInfo: OAuthUserInfo): String {
