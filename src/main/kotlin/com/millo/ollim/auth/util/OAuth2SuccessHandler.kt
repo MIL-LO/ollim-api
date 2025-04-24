@@ -11,7 +11,6 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.time.Duration
-import java.util.*
 
 /**
  * OAuth2 인증 성공 시 JWT 발급 및 Redis에 Refresh Token 저장 처리
@@ -38,14 +37,17 @@ class OAuth2SuccessHandler(
 
         // Redis에 RefreshToken 저장 (TTL 14일)
         redisTemplate.opsForValue().set(
-            "refresh_token:$userId",
+            "auth:refresh_token:$userId",
             refreshToken,
             Duration.ofDays(14)
         )
 
-        // 클라이언트에 토큰 응답
+        // 응답 설정
+        response.status = HttpServletResponse.SC_OK
         response.contentType = "application/json"
         response.characterEncoding = "UTF-8"
+        response.setHeader("Authorization", "Bearer $accessToken")
+
         response.writer.write(
             """
             {
