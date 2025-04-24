@@ -34,7 +34,7 @@ class UserEntity(
 
     @Column(name = "last_login_at")
     @Comment("마지막 로그인 시각 (관리자 포함)")
-    val lastLoginAt: LocalDateTime? = null,
+    var lastLoginAt: LocalDateTime? = null,
 
     @Column(name = "withdrawn_at")
     @Comment("계정 탈퇴 처리 일시 (soft delete 용도)")
