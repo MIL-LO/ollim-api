@@ -7,7 +7,7 @@ import com.millo.ollim.auth.dto.GoogleUserInfo
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 
@@ -16,14 +16,13 @@ import org.springframework.stereotype.Service
  */
 @Service
 class CustomOidcUserService(
-    private val authService: AuthService,
+    private val authService: AuthService
 ) : OidcUserService() {
 
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
         val oidcUser = super.loadUser(userRequest)
 
         val registrationId = userRequest.clientRegistration.registrationId.lowercase()
-
         val userInfo: OAuthUserInfo = when (registrationId) {
             "google" -> GoogleUserInfo(
                 providerId = oidcUser.attributes["sub"] as String,
@@ -40,21 +39,14 @@ class CustomOidcUserService(
 
         val user = authService.saveOrUpdateUser(userInfo)
 
-        val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
-
-        val userPrincipal = UserPrincipal(
+        return UserPrincipal(
             userId = user.id,
             email = user.email,
             role = user.role.name,
             nickname = user.profile?.nickname,
-            authorityList = authorities
-        )
-
-        return DefaultOidcUser(
-            authorities,
-            oidcUser.idToken,
-            oidcUser.userInfo,
-            "sub"
+            authorityList = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}")),
+            idToken = oidcUser.idToken,
+            userInfo = oidcUser.userInfo ?: OidcUserInfo(oidcUser.attributes)
         )
     }
 }
