@@ -1,6 +1,7 @@
 package com.millo.ollim.user.service
 
 import com.millo.ollim.user.domain.UserProfileEntity
+import com.millo.ollim.user.domain.UserStatus
 import com.millo.ollim.user.dto.UserProfileDTO
 import com.millo.ollim.user.repository.UserProfileRepository
 import com.millo.ollim.user.repository.UserRepository
@@ -41,7 +42,9 @@ class UserProfileServiceImpl(
         )
 
         user.profile = profile
+        user.status = UserStatus.ACTIVE
         userProfileRepository.save(profile)
+        userRepository.save(user)
     }
 
 }
