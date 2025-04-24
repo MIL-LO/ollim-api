@@ -33,33 +33,34 @@ class UserProfileEntity(
 
     @Column(name = "nickname", nullable = false, length = 30)
     @Comment("사용자 닉네임 (중복 허용)")
-    val nickname: String = "임시값",
+    var nickname: String = "임시값",
 
     @Column(name = "gender", length = 10)
     @Comment("성별")
-    val gender: String? = null,
+    var gender: String? = null,
 
     @Column(name = "birth_date")
     @Comment("생년월일")
-    val birthDate: LocalDate? = null,
+    var birthDate: LocalDate? = null,
 
     @Column(name = "active_time", length = 10)
     @Comment("주간/야간 활동 시간대")
-    val activeTime: String? = null,
+    var activeTime: String? = null,
 
     @Column(name = "energy_type", length = 10)
     @Comment("낮봄/밤형 구분")
-    val energyType: String? = null,
+    var energyType: String? = null,
 
     @Column(name = "activity_spaces", length = 100)
     @Comment("활동 공간(예: 집, 회사)")
-    val activitySpaces: String? = null,
+    var activitySpaces: String? = null,
 
     @Column(name = "mbti", length = 4)
     @Comment("MBTI 성격유형")
-    val mbti: String? = null,
+    var mbti: String? = null,
 
     @Column(name = "profile_image", columnDefinition = "TEXT")
-    @Comment("감정 캐릭터 이미지 URL")
-    val profileImage: String? = null
+    @Comment("감정 캐릭터 이미지 URL, ENUM사용 고려")
+    @Enumerated(EnumType.STRING)
+    var profileImage: EmotionCharacterType? = null
 )
