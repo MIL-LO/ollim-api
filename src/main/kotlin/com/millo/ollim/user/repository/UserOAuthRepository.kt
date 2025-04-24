@@ -12,5 +12,5 @@ interface UserOAuthRepository : JpaRepository<UserOAuthEntity, Long> {
     /**
      * provider + oauthId 기준으로 사용자 OAuth 정보 조회
      */
-    fun findByProviderAndOauthId(provider: ProviderType, oauthId: String): UserOAuthEntity?
+    fun findByOauthIdAndProvider(oauthId: String, provider: ProviderType): UserOAuthEntity?
 }
