@@ -1,6 +1,7 @@
 package com.millo.ollim.common.config
 
 import com.millo.ollim.auth.service.CustomOidcUserService
+import com.millo.ollim.common.util.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -14,6 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
  */
 @Configuration
 class SecurityConfig(
+    private val oAuth2SuccessHandler: OAuth2SuccessHandler,
     private val customOidcUserService: CustomOidcUserService
 ) {
 
@@ -29,10 +31,9 @@ class SecurityConfig(
             .oauth2Login { oauth2 ->
                 oauth2
                     .userInfoEndpoint { endpoint ->
-                        endpoint
-                            .oidcUserService(customOidcUserService) // OIDCUserService 등록
+                        endpoint.oidcUserService(customOidcUserService) // OIDCUserService 등록
                     }
-                    .defaultSuccessUrl("/", true)
+                    .successHandler(oAuth2SuccessHandler)
             }
 
         return http.build()
