@@ -1,5 +1,6 @@
-package com.millo.ollim.auth.service
+package com.millo.ollim.auth.util
 
+import com.millo.ollim.auth.util.JwtTokenProvider
 import com.millo.ollim.user.domain.UserRole
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
@@ -7,7 +8,6 @@ import io.kotest.matchers.string.shouldNotBeEmpty
 import org.springframework.boot.test.context.SpringBootTest
 import java.util.*
 
-@SpringBootTest
 class JwtTokenProviderTest : StringSpec({
 
     val secret = "ThisIsASecretKeyForJwtThatIsVerySecureAndLongEnough123456"

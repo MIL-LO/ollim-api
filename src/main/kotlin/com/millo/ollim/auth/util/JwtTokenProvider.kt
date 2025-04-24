@@ -1,4 +1,4 @@
-package com.millo.ollim.auth.service
+package com.millo.ollim.auth.util
 
 import com.millo.ollim.user.domain.UserRole
 import io.jsonwebtoken.Claims
