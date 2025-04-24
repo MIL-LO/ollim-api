@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -43,19 +43,21 @@ spring:
       client:
         registration:
           google:
+            provider: google
             client-name: Google
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/{registrationId}
+            redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/google
             scope:
               - openid
               - email
-              - name
+              - profile
             authorization-grant-type: authorization_code
           apple:
             provider: apple
             client-name: Apple
             client-id: ${APPLE_CLIENT_ID}
+            client-secret: ${APPLE_CLIENT_SECRET}
             redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/apple
             scope:
               - openid
@@ -69,6 +71,12 @@ spring:
             token-uri: https://appleid.apple.com/auth/token
             jwk-set-uri: https://appleid.apple.com/auth/keys
             user-name-attribute: sub
+oauth:
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    secret-key-path: ${APPLE_PRIVATE_KEY_PATH}
 
 jasypt:
   encryptor:
@@ -111,4 +119,5 @@ logging:
     com.millo.ollim.auth: DEBUG
     org.springframework.security: DEBUG
     org.springframework.web: DEBUG
-
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
