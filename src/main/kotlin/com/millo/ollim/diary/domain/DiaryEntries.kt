@@ -4,6 +4,8 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -21,7 +23,12 @@ data class DiaryEntries(
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean,
     @Column(name = "created_at", nullable = false)
-    val createdAt: Date,
+    val createdAt: LocalDateTime,
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: Date,
-)
+    val updatedAt: LocalDateTime,
+){
+    constructor(userId: UUID,mood: String, emotionTag: String) : this(
+        UUID.randomUUID(), userId,
+        mood, emotionTag, false,
+        LocalDateTime.now(), LocalDateTime.now())
+}
