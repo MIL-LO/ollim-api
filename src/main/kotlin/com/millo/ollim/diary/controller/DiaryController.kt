@@ -1,8 +1,10 @@
 package com.millo.ollim.diary.controller
 
 import com.millo.ollim.diary.request.NewDiaryRequest
+import com.millo.ollim.diary.request.TagRequest
 import com.millo.ollim.diary.response.DiaryResponse
 import com.millo.ollim.diary.service.DiaryService
+import com.millo.ollim.diary.service.EmotionTagsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,7 +17,9 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/diary")
-class DiaryController(@Autowired val diaryService: DiaryService) {
+class DiaryController(
+    @Autowired val diaryService: DiaryService,
+    @Autowired val emotionTagsService: EmotionTagsService) {
 
     @PostMapping("")
     fun createNewDiary(@RequestParam userId: UUID, @RequestBody newDiaryRequest: NewDiaryRequest):
@@ -24,4 +28,8 @@ class DiaryController(@Autowired val diaryService: DiaryService) {
     @GetMapping("/list")
     fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryResponse>> =
         ResponseEntity.ok().body(diaryService.getDiaries(userId))
+
+    @PostMapping("/tag")
+    fun createNewTag(@RequestBody request: TagRequest):ResponseEntity<String> =
+        ResponseEntity.ok().body(emotionTagsService.createNewTag(request))
 }
