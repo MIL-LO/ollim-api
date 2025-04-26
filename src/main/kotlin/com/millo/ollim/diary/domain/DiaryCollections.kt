@@ -1,6 +1,8 @@
 package com.millo.ollim.diary.domain
 
+import com.millo.ollim.diary.request.CollectionRequest
 import jakarta.persistence.*
+import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -18,8 +20,13 @@ data class DiaryCollections(
     @Column(name = "sort_order")
     val sortOrder: Int,
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: Date,
+    val createdAt: LocalDateTime,
     @Column(name = "updated_at")
-    val updatedAt: Date,
+    val updatedAt: LocalDateTime,
 
-)
+    ) {
+    constructor(request: CollectionRequest, userId: UUID, sortOrder: Int) : this(
+        UUID.randomUUID(), userId, request.title, request.description,
+        sortOrder, LocalDateTime.now(), LocalDateTime.now()
+    )
+}

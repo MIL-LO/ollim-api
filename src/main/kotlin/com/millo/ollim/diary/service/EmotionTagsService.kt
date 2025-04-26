@@ -15,4 +15,9 @@ class EmotionTagsService(
         val res = emotionTagsRepository.save(EmotionTags(request))
         return res.toString()
     }
+
+    fun getTags(): List<EmotionTags> {
+        return emotionTagsRepository.findAll()
+    }
+
 }
