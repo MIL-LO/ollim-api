@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.domain
 
+import com.millo.ollim.diary.request.UpdateDiary
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -31,4 +32,10 @@ data class DiaryEntries(
         UUID.randomUUID(), userId,
         mood, emotionTag, false,
         LocalDateTime.now(), LocalDateTime.now())
+
+    constructor(userId:UUID, updateDiary: UpdateDiary,isDeleted: Boolean, createdAt: LocalDateTime, updatedAt: LocalDateTime) : this(
+        updateDiary.diaryId, userId,
+        updateDiary.mood,updateDiary.emotionTags.toString(),
+        isDeleted, createdAt, updatedAt
+        )
 }

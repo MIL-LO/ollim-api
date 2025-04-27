@@ -24,4 +24,9 @@ class DiaryContentsService(@Autowired val diaryContentsRepository: DiaryContents
         return res
     }
 
+    fun save(diaryEntries: DiaryContents): DiaryContents {
+        val res = diaryContentsRepository.save(diaryEntries)
+        return res
+    }
+
 }

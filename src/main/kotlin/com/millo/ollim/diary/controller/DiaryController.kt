@@ -4,8 +4,9 @@ import com.millo.ollim.diary.domain.DiaryCollectionItems
 import com.millo.ollim.diary.domain.DiaryCollections
 import com.millo.ollim.diary.domain.EmotionTags
 import com.millo.ollim.diary.request.CollectionRequest
-import com.millo.ollim.diary.request.NewDiaryRequest
+import com.millo.ollim.diary.request.DiaryRequest
 import com.millo.ollim.diary.request.TagRequest
+import com.millo.ollim.diary.request.UpdateDiary
 import com.millo.ollim.diary.response.DiaryResponse
 import com.millo.ollim.diary.service.DiaryCollectionItemsService
 import com.millo.ollim.diary.service.DiaryCollectionsService
@@ -13,12 +14,7 @@ import com.millo.ollim.diary.service.DiaryService
 import com.millo.ollim.diary.service.EmotionTagsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.util.UUID
 
 @RestController
@@ -31,9 +27,11 @@ class DiaryController(
 ) {
 
     @PostMapping("")
-    fun createNewDiary(@RequestParam userId: UUID, @RequestBody newDiaryRequest: NewDiaryRequest):
+    fun createNewDiary(@RequestParam userId: UUID, @RequestBody newDiaryRequest: DiaryRequest):
         ResponseEntity<DiaryResponse> = ResponseEntity.ok().body(diaryService.createNewDiary(userId,newDiaryRequest))
-
+    @PutMapping("")
+    fun updateDiary(@RequestParam userId: UUID, @RequestBody updateDiary: UpdateDiary): ResponseEntity<DiaryResponse> =
+        ResponseEntity.ok().body(diaryService.updateDiary(userId,updateDiary))
     @GetMapping("/list")
     fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryResponse>> =
         ResponseEntity.ok().body(diaryService.getDiaries(userId))
@@ -60,4 +58,5 @@ class DiaryController(
     @GetMapping("/collection/item")
     fun getUserCollectionItems(@RequestParam userId: UUID, @RequestParam collectionId:UUID): ResponseEntity<List<DiaryCollectionItems>> =
         ResponseEntity.ok().body(diaryCollectionsItemsService.getUserCollectionItems(userId, collectionId))
+
 }

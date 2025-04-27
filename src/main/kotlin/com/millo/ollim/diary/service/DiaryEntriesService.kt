@@ -19,5 +19,7 @@ class DiaryEntriesService (@Autowired val diaryEntriesRepository: DiaryEntriesRe
 
     @Transactional(readOnly = true)
     fun findByUserId(id: UUID) = diaryEntriesRepository.findAllByUserId(id)
+    @Transactional
+    fun findById(diaryId: UUID): DiaryEntries = diaryEntriesRepository.findById(diaryId).orElseThrow()
 
 }

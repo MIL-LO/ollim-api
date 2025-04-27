@@ -1,13 +1,15 @@
 package com.millo.ollim.diary.service
 
+import com.millo.ollim.diary.domain.DiaryContents
 import com.millo.ollim.diary.domain.DiaryEntries
-import com.millo.ollim.diary.repository.EmotionTagsRepository
-import com.millo.ollim.diary.request.NewDiaryRequest
+import com.millo.ollim.diary.request.DiaryRequest
+import com.millo.ollim.diary.request.UpdateDiary
 import com.millo.ollim.diary.response.DiaryResponse
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 import java.util.Collections
 import java.util.UUID
 
@@ -19,7 +21,7 @@ class DiaryService(
     @Autowired val diaryEmotionsService: DiaryEmotionsService,
 ) {
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
-    fun createNewDiary(userId: UUID, newDiaryRequest: NewDiaryRequest): DiaryResponse {
+    fun createNewDiary(userId: UUID, newDiaryRequest: DiaryRequest): DiaryResponse {
 
         val entry = diaryEntriesService.save(DiaryEntries(userId,newDiaryRequest.mood,newDiaryRequest.emotionTags.toString()))
         val content = diaryContentsService.save(entry,"contents","img_url");
@@ -40,5 +42,30 @@ class DiaryService(
         }
         println("res = ${res}")
         return res
+    }
+
+    @Transactional(readOnly = false)
+    fun updateDiary(userId: UUID, updateDiary: UpdateDiary): DiaryResponse {
+        val diaryEntry:DiaryEntries = diaryEntriesService.findById(updateDiary.diaryId)
+        if (diaryEntry.userId != userId) {
+            throw Exception("유저 아이디 불일치")
+        }
+        diaryEntriesService.save(
+            DiaryEntries(userId,updateDiary,diaryEntry.isDeleted,diaryEntry.createdAt,
+                LocalDateTime.now()
+            )
+        )
+
+        val diaryContents = diaryContentsService.findByDiaryId(diaryEntry.id)
+        if (diaryContents == null) {
+            throw IllegalStateException("diaryContents를 찾을 수 없습니다: id=${diaryEntry.id}")
+        }
+
+        diaryContents.content=updateDiary.content
+        diaryContents.updatedAt=LocalDateTime.now()
+        diaryContents.imageUrl=updateDiary.imgUrl.toString()
+
+//        diaryContentsService.save(diaryContents)
+        return DiaryResponse(diaryEntry,diaryContents, emptyList())
     }
 }

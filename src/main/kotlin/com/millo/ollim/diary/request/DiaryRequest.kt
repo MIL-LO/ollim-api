@@ -1,10 +1,9 @@
 package com.millo.ollim.diary.request
 
-import jakarta.validation.constraints.NotBlank
 import org.springframework.web.multipart.MultipartFile
 
 
-data class NewDiaryRequest(
+data class DiaryRequest(
     val content: String,
     val imgUrl: MultipartFile?=null,
     val mood: String, // 무드 = 기분

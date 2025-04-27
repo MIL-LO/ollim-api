@@ -10,4 +10,5 @@ interface DiaryContentsRepository: MongoRepository<DiaryContents,UUID> {
     fun findById(toString: String): DiaryContents
     fun findAllByUserId(toString: String): MutableList<DiaryContents>
     fun findByUserId(toString: String): DiaryContents
+
 }
