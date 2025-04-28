@@ -1,6 +1,5 @@
 package com.millo.ollim.diary.service
 
-import com.millo.ollim.diary.domain.DiaryContents
 import com.millo.ollim.diary.domain.DiaryEntries
 import com.millo.ollim.diary.request.DiaryRequest
 import com.millo.ollim.diary.request.UpdateDiary
@@ -19,7 +18,9 @@ class DiaryService(
     @Autowired val diaryContentsService: DiaryContentsService,
     @Autowired val emotionTagsService: EmotionTagsService,
     @Autowired val diaryEmotionsService: DiaryEmotionsService,
+    @Autowired val diaryCollectionItemsService: DiaryCollectionItemsService,
 ) {
+
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
     fun createNewDiary(userId: UUID, newDiaryRequest: DiaryRequest): DiaryResponse {
 
@@ -27,7 +28,6 @@ class DiaryService(
         val content = diaryContentsService.save(entry,"contents","img_url");
         val diaryEmotions = diaryEmotionsService.save(entry.id, newDiaryRequest.emotionTags)
 
-//        val diaryEmotions =
         return DiaryResponse(entry,content,diaryEmotions)
     }
 
@@ -65,7 +65,23 @@ class DiaryService(
         diaryContents.updatedAt=LocalDateTime.now()
         diaryContents.imageUrl=updateDiary.imgUrl.toString()
 
-//        diaryContentsService.save(diaryContents)
         return DiaryResponse(diaryEntry,diaryContents, emptyList())
+    }
+
+    @Transactional(readOnly = false)
+    fun deleteDiary(userId: UUID, diaryId: UUID): String {
+        // diary 연결된 놈들
+        // diaryEmotions, diaryCollections, diary_entry, diary_contents
+        val diaryEntry = diaryEntriesService.findById(diaryId)
+        if (diaryEntry.userId != userId) {
+            return "invalid user id: $diaryId"
+        }
+
+        diaryEmotionsService.delete(diaryId)
+        diaryCollectionItemsService.delete(diaryId)
+        diaryContentsService.delete(diaryId)
+        diaryEntriesService.delete(diaryId)
+
+        return "success"
     }
 }

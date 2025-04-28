@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.controller
 
+import com.millo.ollim.diary.service.DiaryService
 import com.millo.ollim.diary.domain.DiaryCollectionItems
 import com.millo.ollim.diary.domain.DiaryCollections
 import com.millo.ollim.diary.domain.EmotionTags
@@ -10,7 +11,6 @@ import com.millo.ollim.diary.request.UpdateDiary
 import com.millo.ollim.diary.response.DiaryResponse
 import com.millo.ollim.diary.service.DiaryCollectionItemsService
 import com.millo.ollim.diary.service.DiaryCollectionsService
-import com.millo.ollim.diary.service.DiaryService
 import com.millo.ollim.diary.service.EmotionTagsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
@@ -32,6 +32,9 @@ class DiaryController(
     @PutMapping("")
     fun updateDiary(@RequestParam userId: UUID, @RequestBody updateDiary: UpdateDiary): ResponseEntity<DiaryResponse> =
         ResponseEntity.ok().body(diaryService.updateDiary(userId,updateDiary))
+    @DeleteMapping("")
+    fun deleteDiary(@RequestParam userId:UUID, @RequestParam diaryId:UUID): ResponseEntity<String> =
+        ResponseEntity.ok().body(diaryService.deleteDiary(userId,diaryId))
     @GetMapping("/list")
     fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryResponse>> =
         ResponseEntity.ok().body(diaryService.getDiaries(userId))
@@ -55,8 +58,10 @@ class DiaryController(
     @PostMapping("/collection/item")
     fun addCollectionItem(@RequestParam userId: UUID, @RequestParam collectionId: UUID, @RequestParam diaryId: UUID):ResponseEntity<DiaryCollectionItems> =
         ResponseEntity.ok().body(diaryCollectionsItemsService.addCollectionItem(userId,collectionId, diaryId))
+
     @GetMapping("/collection/item")
     fun getUserCollectionItems(@RequestParam userId: UUID, @RequestParam collectionId:UUID): ResponseEntity<List<DiaryCollectionItems>> =
         ResponseEntity.ok().body(diaryCollectionsItemsService.getUserCollectionItems(userId, collectionId))
+
 
 }

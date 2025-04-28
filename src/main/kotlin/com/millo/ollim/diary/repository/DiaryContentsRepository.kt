@@ -6,9 +6,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface DiaryContentsRepository: MongoRepository<DiaryContents,UUID> {
-    fun findById(toString: String): DiaryContents
+interface DiaryContentsRepository: MongoRepository<DiaryContents,String> {
     fun findAllByUserId(toString: String): MutableList<DiaryContents>
     fun findByUserId(toString: String): DiaryContents
-
 }

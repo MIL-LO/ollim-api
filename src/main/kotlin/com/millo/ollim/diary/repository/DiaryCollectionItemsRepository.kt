@@ -11,4 +11,5 @@ import java.util.UUID
 interface DiaryCollectionItemsRepository: JpaRepository<DiaryCollectionItems, DiaryCollectionId> {
     fun findByIdDiaryCollectionId(collectionId: UUID): MutableList<DiaryCollectionItems>
     fun findAllByIdDiaryCollectionId(collectionId: UUID): List<DiaryCollectionItems>
+    fun deleteByIdDiaryId(diaryId: UUID)
 }

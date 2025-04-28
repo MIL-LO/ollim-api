@@ -18,4 +18,9 @@ class DiaryEmotionsService(
         }
         return diaryEmotions
     }
+
+    @Transactional(readOnly = false)
+    fun delete(diaryId: UUID) {
+        diaryEmotionsRepository.deleteByIdDiaryId(diaryId)
+    }
 }

@@ -25,4 +25,9 @@ class DiaryCollectionItemsService(
         return diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(collectionId)
     }
 
+    @Transactional(readOnly = false)
+    fun delete(diaryId: UUID) {
+        diaryCollectionItemsRepository.deleteByIdDiaryId(diaryId)
+    }
+
 }
