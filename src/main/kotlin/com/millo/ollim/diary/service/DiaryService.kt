@@ -65,7 +65,10 @@ class DiaryService(
         diaryContents.updatedAt=LocalDateTime.now()
         diaryContents.imageUrl=updateDiary.imgUrl.toString()
 
-        return DiaryResponse(diaryEntry,diaryContents, emptyList())
+        diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
+        val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)
+        println("diaryEmotions = ${diaryEmotions}")
+        return DiaryResponse(diaryEntry,diaryContents, diaryEmotions)
     }
 
     @Transactional(readOnly = false)
