@@ -25,7 +25,7 @@ class DiaryController(
     @Autowired val diaryCollectionsService: DiaryCollectionsService,
     @Autowired val diaryCollectionsItemsService: DiaryCollectionItemsService
 ) {
-
+    // 다이어리 CRUD
     @PostMapping("")
     fun createNewDiary(@RequestParam userId: UUID, @RequestBody newDiaryRequest: DiaryRequest):
         ResponseEntity<DiaryResponse> = ResponseEntity.ok().body(diaryService.createNewDiary(userId,newDiaryRequest))
@@ -39,6 +39,7 @@ class DiaryController(
     fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryResponse>> =
         ResponseEntity.ok().body(diaryService.getDiaries(userId))
 
+    // 태그 CRUD
     @PostMapping("/tag")
     fun createNewTag(@RequestBody request: TagRequest):ResponseEntity<String> =
         ResponseEntity.ok().body(emotionTagsService.createNewTag(request))
@@ -46,6 +47,10 @@ class DiaryController(
     @GetMapping("/tags")
     fun getTags():ResponseEntity<List<EmotionTags>> =
         ResponseEntity.ok().body(emotionTagsService.getTags())
+    @PutMapping("/tag")
+    fun updateTag(@RequestBody request: TagRequest):ResponseEntity<String> =
+        ResponseEntity.ok().body(emotionTagsService.updateTag(request))
+
 
     @PostMapping("/collection")
     fun createCollection(@RequestParam userId: UUID, @RequestBody request: CollectionRequest):ResponseEntity<DiaryCollections> =

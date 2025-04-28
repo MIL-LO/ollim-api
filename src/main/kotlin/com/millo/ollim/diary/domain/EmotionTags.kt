@@ -3,7 +3,6 @@ package com.millo.ollim.diary.domain
 import com.millo.ollim.diary.request.TagRequest
 import jakarta.persistence.*
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @Table(name = "emotion_tags")
@@ -29,11 +28,19 @@ data class EmotionTags(
     @Column(name = "updated_at")
     val updatedAt: LocalDateTime,
 ){
+
     constructor(request: TagRequest) : this(
-        0,request.name,request.description,
+        request.id,request.name,request.description,
         request.color,request.category,
-        request.group,true,
+        request.group,request.isActive,
         LocalDateTime.now(), LocalDateTime.now(),
+    )
+
+    constructor(original: EmotionTags, request: TagRequest) : this(
+        request.id,request.name,request.description,
+        request.color,request.category,
+        request.group,request.isActive,
+        original.createdAt, LocalDateTime.now(),
     )
 }
 
