@@ -38,4 +38,10 @@ data class DiaryEntries(
         updateDiary.mood,updateDiary.emotionTags.toString(),
         isDeleted, createdAt, updatedAt
         )
+
+    constructor(diaryId: UUID) : this(
+        diaryId, diaryId,
+        "","",
+        false, LocalDateTime.now(), LocalDateTime.now()
+    )
 }

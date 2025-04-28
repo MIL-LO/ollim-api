@@ -1,24 +1,35 @@
 package com.millo.ollim.diary.domain
 
-import jakarta.persistence.Column
-import jakarta.persistence.EmbeddedId
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
 @Table(name = "diary_emotions")
-data class DiaryEmotions (
+data class DiaryEmotions(
     @EmbeddedId
-    val id:DiaryEntryEmotionId,
+    val id: DiaryEntryEmotionId = DiaryEntryEmotionId(UUID.randomUUID(), 0),
+//
+//    @MapsId("diaryId")
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "diary_id")
+//    val diary: DiaryEntries,
+
+    @MapsId("tagId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "emotion_tag_id")
+    val emotionTag: EmotionTags,
+
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+
     @Column(name = "deleted_at", nullable = false)
-    val deletedAt: LocalDateTime,
+    val deletedAt: LocalDateTime = LocalDateTime.now()
 ) {
-    constructor(id: UUID, tagId: Int) : this(
-        DiaryEntryEmotionId(id,tagId),LocalDateTime.now(),LocalDateTime.now()
+    // 생성자 추가: 편하게 만들 수 있게
+    constructor(diary: DiaryEntries, emotionTag: EmotionTags) : this(
+        id = DiaryEntryEmotionId(diary.id, emotionTag.id),
+//        diary = diary,
+        emotionTag = emotionTag
     )
 }

@@ -42,5 +42,18 @@ data class EmotionTags(
         request.group,request.isActive,
         original.createdAt, LocalDateTime.now(),
     )
+
+    constructor(id: Int) : this(
+        id = id,
+        name = "",
+        description = "",
+        color = "",
+        category = "",
+        group = "",
+        isActive = true,
+        createdAt = LocalDateTime.now(),
+        updatedAt = LocalDateTime.now()
+    )
+
 }
 

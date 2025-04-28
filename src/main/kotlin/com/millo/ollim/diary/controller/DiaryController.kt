@@ -43,14 +43,15 @@ class DiaryController(
     @PostMapping("/tag")
     fun createNewTag(@RequestBody request: TagRequest):ResponseEntity<String> =
         ResponseEntity.ok().body(emotionTagsService.createNewTag(request))
-
     @GetMapping("/tags")
     fun getTags():ResponseEntity<List<EmotionTags>> =
         ResponseEntity.ok().body(emotionTagsService.getTags())
     @PutMapping("/tag")
     fun updateTag(@RequestBody request: TagRequest):ResponseEntity<String> =
         ResponseEntity.ok().body(emotionTagsService.updateTag(request))
-
+    @DeleteMapping("/tag")
+    fun deleteTag(@RequestParam tagId:Int): ResponseEntity<String> =
+        ResponseEntity.ok().body(emotionTagsService.delete(tagId))
 
     @PostMapping("/collection")
     fun createCollection(@RequestParam userId: UUID, @RequestBody request: CollectionRequest):ResponseEntity<DiaryCollections> =

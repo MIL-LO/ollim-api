@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class EmotionTagsService(
     private val emotionTagsRepository: EmotionTagsRepository,
+    private val emotionsService: DiaryEmotionsService
 ) {
     @Transactional
     fun createNewTag(request: TagRequest):String{
@@ -29,6 +30,14 @@ class EmotionTagsService(
         val tag: EmotionTags = emotionTagsRepository.findById(request.id).orElse(null) ?: throw EntityNotFoundException()
         println("tag = ${tag}")
         emotionTagsRepository.save(EmotionTags(tag, request))
+
+        return "success"
+    }
+
+    @Transactional
+    fun delete(tagId: Int): String? {
+        emotionsService.deleteByTag(tagId)
+        emotionTagsRepository.deleteAllById(tagId)
 
         return "success"
     }

@@ -8,4 +8,6 @@ import org.springframework.stereotype.Repository
 interface EmotionTagsRepository: JpaRepository<EmotionTags, Int> {
     fun existsByName(tag: String): Boolean
 
+    fun deleteAllById(tagId: Int)
+
 }

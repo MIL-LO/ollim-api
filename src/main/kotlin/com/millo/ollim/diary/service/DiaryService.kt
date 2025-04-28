@@ -31,12 +31,12 @@ class DiaryService(
         return DiaryResponse(entry,content,diaryEmotions)
     }
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = true)
     fun getDiaries(userId: UUID): List<DiaryResponse> {
         val res:MutableList<DiaryResponse> = mutableListOf()
         val entries = diaryEntriesService.findByUserId(userId)
         entries.forEach { diaryEntry ->
-            val diaryResponse =DiaryResponse(diaryEntry, diaryContentsService.findByDiaryId(diaryEntry.id),Collections.emptyList())
+            val diaryResponse =DiaryResponse(diaryEntry, diaryContentsService.findByDiaryId(diaryEntry.id),diaryEmotionsService.findByDiaryId(diaryEntry.id))
             println("diaryResponse = ${diaryResponse}")
             res.add(diaryResponse)
         }
@@ -77,7 +77,7 @@ class DiaryService(
             return "invalid user id: $diaryId"
         }
 
-        diaryEmotionsService.delete(diaryId)
+        diaryEmotionsService.deleteByDiaryId(diaryId)
         diaryCollectionItemsService.delete(diaryId)
         diaryContentsService.delete(diaryId)
         diaryEntriesService.delete(diaryId)
