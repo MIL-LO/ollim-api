@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: ollim-api
-
   config:
     import: optional:file:${ENV_FILE:.env.local}[.properties]
 
@@ -47,7 +46,7 @@ spring:
             client-name: Google
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/google
+            redirect-uri: http://localhost:5000/login/oauth2/code/google
             scope:
               - openid
               - email
