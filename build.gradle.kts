@@ -45,11 +45,9 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
-    implementation("com.auth0:java-jwt:4.4.0")
 
     // Jasypt
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.5")
-    implementation("org.jasypt:jasypt:1.9.3")
 
     // Sentry
     implementation("io.sentry:sentry-spring-boot-starter:8.3.0")
@@ -60,22 +58,18 @@ dependencies {
 
     // === TEST ===
     // Kotest (JUnit5 연동)
-    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
 
     // MockK
-    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk:1.13.12")
 
     // Spring Test
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("org.springframework.security:spring-security-test")
-
-    // JUnit5 런타임 (Kotest와 호환을 위해 명시적 선언)
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.10.1")
 }
 
 tasks.withType<Test> {
@@ -84,7 +78,7 @@ tasks.withType<Test> {
 
 kotlin {
     compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xjvm-default=all")
     }
 }
 
