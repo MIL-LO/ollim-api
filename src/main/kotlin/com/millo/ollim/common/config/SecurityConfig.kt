@@ -1,3 +1,4 @@
+// src/main/kotlin/com/millo/ollim/common/config/SecurityConfig.kt
 package com.millo.ollim.common.config
 
 import com.millo.ollim.auth.service.CustomOidcUserService
@@ -6,6 +7,7 @@ import com.millo.ollim.common.util.JwtTokenProvider
 import com.millo.ollim.common.util.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
@@ -19,15 +21,16 @@ class SecurityConfig(
     private val oAuth2SuccessHandler: OAuth2SuccessHandler,
     private val customOidcUserService: CustomOidcUserService,
     private val corsConfigurationSource: CorsConfigurationSource,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val redisTemplate: StringRedisTemplate
 ) {
 
     /**
-     * JwtAuthenticationFilter 빈으로 등록
+     * JwtAuthenticationFilter 빈 등록
      */
     @Bean
     fun jwtAuthenticationFilter(): JwtAuthenticationFilter {
-        return JwtAuthenticationFilter(jwtTokenProvider)
+        return JwtAuthenticationFilter(jwtTokenProvider, redisTemplate)
     }
 
     /**
