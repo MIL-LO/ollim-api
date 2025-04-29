@@ -66,10 +66,17 @@ class JwtTokenProvider(
     }
 
     /**
-     * Redis에서 RefreshToken 저장 시 사용할 키 생성
+     * Redis에 RefreshToken 저장 시 사용할 키 생성
      */
     fun getRefreshTokenKey(userId: UUID): String {
         return "refresh_token:$userId"
+    }
+
+    /**
+     * Redis에 AccessToken 블랙리스트 등록 시 사용할 키 생성
+     */
+    fun getBlacklistKey(accessToken: String): String {
+        return "blacklist:$accessToken"
     }
 
     /**
@@ -134,6 +141,13 @@ class JwtTokenProvider(
         }
 
         return UUID.fromString(claims.subject)
+    }
+
+    /**
+     * JWT 만료 시간 추출
+     */
+    fun getExpiration(token: String): Date {
+        return parseClaims(token).expiration
     }
 
     /**
