@@ -1,57 +1,64 @@
 package com.millo.ollim.common.config
 
 import com.millo.ollim.auth.service.CustomOidcUserService
+import com.millo.ollim.common.util.JwtAuthenticationFilter
+import com.millo.ollim.common.util.JwtTokenProvider
 import com.millo.ollim.common.util.OAuth2SuccessHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.web.cors.CorsConfiguration
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfigurationSource
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 /**
- * Spring Security 설정
+ * Spring Security 설정 클래스
  */
 @Configuration
 class SecurityConfig(
     private val oAuth2SuccessHandler: OAuth2SuccessHandler,
-    private val customOidcUserService: CustomOidcUserService
+    private val customOidcUserService: CustomOidcUserService,
+    private val corsConfigurationSource: CorsConfigurationSource,
+    private val jwtTokenProvider: JwtTokenProvider
 ) {
 
+    /**
+     * JwtAuthenticationFilter 빈으로 등록
+     */
+    @Bean
+    fun jwtAuthenticationFilter(): JwtAuthenticationFilter {
+        return JwtAuthenticationFilter(jwtTokenProvider)
+    }
+
+    /**
+     * Security Filter Chain 구성
+     */
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
-            .cors { it.configurationSource(corsConfigurationSource()) }
+            .cors { it.configurationSource(corsConfigurationSource) }
             .authorizeHttpRequests {
-                it.requestMatchers("/**").permitAll()
-                it.anyRequest().authenticated()
+                it
+                    .requestMatchers(
+                        "/api/v1/auth/**",
+                        "/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/actuator/health",
+                        "/**"
+                    ).permitAll()
+                    .anyRequest().authenticated()
             }
             .oauth2Login { oauth2 ->
                 oauth2
-                    .userInfoEndpoint { endpoint ->
-                        endpoint.oidcUserService(customOidcUserService) // OIDCUserService 등록
+                    .userInfoEndpoint {
+                        it.oidcUserService(customOidcUserService)
                     }
                     .successHandler(oAuth2SuccessHandler)
             }
+            .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()
-    }
-
-    /**
-     * CORS 처리
-     */
-    @Bean
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val config = CorsConfiguration()
-        config.allowedOrigins = listOf("*")
-        config.allowedHeaders = listOf("*")
-        config.allowedMethods = listOf("*")
-
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", config)
-
-        return source
     }
 }
