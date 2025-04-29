@@ -18,11 +18,12 @@ class DiaryContentsService(@Autowired val diaryContentsRepository: DiaryContents
         return res
     }
 
-    @Transactional(readOnly = false)
+    @Transactional(readOnly = true)
     fun findByDiaryId(id: UUID): DiaryContents {
         val res = diaryContentsRepository.findById(id.toString()).orElse(null)
         return res
     }
+
     @Transactional(readOnly = false)
     fun save(diaryEntries: DiaryContents): DiaryContents {
         val res = diaryContentsRepository.save(diaryEntries)
@@ -31,6 +32,13 @@ class DiaryContentsService(@Autowired val diaryContentsRepository: DiaryContents
     @Transactional(readOnly = false)
     fun delete(diaryId: UUID) {
         diaryContentsRepository.deleteById(diaryId.toString())
+    }
+
+    @Transactional(readOnly = false)
+    fun update(id: UUID, content: String, imgUrl: String): DiaryContents {
+        val diaryContent = diaryContentsRepository.findById(id.toString()).orElse(null)
+        diaryContent.update(content, imgUrl)
+        return diaryContent
     }
 
 }

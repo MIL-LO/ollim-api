@@ -11,26 +11,25 @@ import java.util.*
 data class DiaryContents(
     @Id
     @Field(name = "_id")
-    val id: String,
+    var id: String,
     @Field(name = "user_id")
-    val userId: String,
+    var userId: String,
     @Field(name = "content")
     var content: String,
     @Field(name = "image_url")
     var imageUrl: String,
     @Field(name = "created_at")
-    val createdAt: LocalDateTime,
+    var createdAt: LocalDateTime,
     @Field(name = "updated_at")
     var updatedAt: LocalDateTime,
 ) {
+    fun update(content: String, imgUrl: String) {
+        this.content=content
+        this.imageUrl = imgUrl
+        this.updatedAt = LocalDateTime.now()
+    }
+
     constructor(id: UUID, userId: UUID, content: String, imageUrl: String) : this(
         id.toString(), userId.toString(), content, imageUrl, LocalDateTime.now(), LocalDateTime.now()
     )
-
-     constructor(userId: UUID, updateDiary: UpdateDiary, createdAt: LocalDateTime):  this(
-        updateDiary.diaryId.toString(),userId.toString(),updateDiary.content,
-         updateDiary.imgUrl.toString(),
-         createdAt, LocalDateTime.now()
-    )
-
 }

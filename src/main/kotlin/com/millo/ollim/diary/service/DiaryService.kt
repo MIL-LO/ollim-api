@@ -56,14 +56,11 @@ class DiaryService(
             )
         )
 
-        val diaryContents = diaryContentsService.findByDiaryId(diaryEntry.id)
+        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,updateDiary.imgUrl)
+
         if (diaryContents == null) {
             throw IllegalStateException("diaryContents를 찾을 수 없습니다: id=${diaryEntry.id}")
         }
-
-        diaryContents.content=updateDiary.content
-        diaryContents.updatedAt=LocalDateTime.now()
-        diaryContents.imageUrl=updateDiary.imgUrl.toString()
 
         diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
         val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)
@@ -86,5 +83,11 @@ class DiaryService(
         diaryEntriesService.delete(diaryId)
 
         return "success"
+    }
+
+    fun getDiary(userId: UUID, diaryId: UUID): DiaryResponse {
+        return DiaryResponse(diaryEntriesService.findById(diaryId),
+            diaryContentsService.findByDiaryId(diaryId),
+            diaryEmotionsService.findByDiaryId(diaryId))
     }
 }
