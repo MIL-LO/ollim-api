@@ -2,16 +2,13 @@ package com.millo.ollim.auth.controller
 
 import com.millo.ollim.auth.domain.UserPrincipal
 import com.millo.ollim.user.dto.UserProfileDTO
-import com.millo.ollim.auth.service.AuthService
 import com.millo.ollim.common.enums.Versions
 import com.millo.ollim.user.service.UserProfileService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 
 /**
  * 인증된 사용자 정보 확인용 Controller
@@ -26,7 +23,11 @@ class AuthController(
      * 로그인한 회원 정보 추출 (간단정보)
      */
     @GetMapping("/me")
-    fun getCurrentUser(@AuthenticationPrincipal user: UserPrincipal): Map<String, Any?> {
+    fun getCurrentUser(@AuthenticationPrincipal user: UserPrincipal?): Map<String, Any?> {
+        if (user == null) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.")
+        }
+
         return mapOf(
             "userId" to user.userId.toString(),
             "email" to user.email,
@@ -40,9 +41,13 @@ class AuthController(
      */
     @PostMapping("/signup/profile")
     fun submitProfile(
-        @AuthenticationPrincipal user: UserPrincipal,
+        @AuthenticationPrincipal user: UserPrincipal?,
         @RequestBody request: UserProfileDTO.Request
-    ) : ResponseEntity<Void> {
+    ): ResponseEntity<Void> {
+        if (user == null) {
+            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다.")
+        }
+
         userProfileService.createOrUpdateProfile(userId = user.userId, request = request)
         return ResponseEntity.ok().build()
     }
