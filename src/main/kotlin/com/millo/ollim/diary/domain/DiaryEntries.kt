@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.domain
 
+import com.millo.ollim.common.domain.BaseTimeEntity
 import com.millo.ollim.diary.request.UpdateDiary
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -23,25 +24,19 @@ data class DiaryEntries(
     val emotionTag: String,
     @Column(name = "is_deleted", nullable = false)
     val isDeleted: Boolean,
-    @Column(name = "created_at", nullable = false)
-    val createdAt: LocalDateTime,
-    @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime,
-){
+): BaseTimeEntity()
+{
     constructor(userId: UUID,mood: String, emotionTag: String) : this(
         UUID.randomUUID(), userId,
-        mood, emotionTag, false,
-        LocalDateTime.now(), LocalDateTime.now())
+        mood, emotionTag, false)
 
-    constructor(userId:UUID, updateDiary: UpdateDiary,isDeleted: Boolean, createdAt: LocalDateTime, updatedAt: LocalDateTime) : this(
+    constructor(userId:UUID, updateDiary: UpdateDiary,isDeleted: Boolean) : this(
         updateDiary.diaryId, userId,
         updateDiary.mood,updateDiary.emotionTags.toString(),
-        isDeleted, createdAt, updatedAt
-        )
+        isDeleted)
 
     constructor(diaryId: UUID) : this(
         diaryId, diaryId,
         "","",
-        false, LocalDateTime.now(), LocalDateTime.now()
-    )
+        false)
 }

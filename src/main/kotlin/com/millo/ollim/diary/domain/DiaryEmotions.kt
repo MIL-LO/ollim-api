@@ -9,12 +9,6 @@ import java.util.*
 data class DiaryEmotions(
     @EmbeddedId
     val id: DiaryEntryEmotionId = DiaryEntryEmotionId(UUID.randomUUID(), 0),
-//
-//    @MapsId("diaryId")
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "diary_id")
-//    val diary: DiaryEntries,
-
     @MapsId("tagId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "emotion_tag_id")
@@ -29,7 +23,6 @@ data class DiaryEmotions(
     // 생성자 추가: 편하게 만들 수 있게
     constructor(diary: DiaryEntries, emotionTag: EmotionTags) : this(
         id = DiaryEntryEmotionId(diary.id, emotionTag.id),
-//        diary = diary,
         emotionTag = emotionTag
     )
 }

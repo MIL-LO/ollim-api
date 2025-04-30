@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.domain
 
+import com.millo.ollim.common.domain.BaseTimeEntity
 import com.millo.ollim.diary.request.TagRequest
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -23,25 +24,19 @@ data class EmotionTags(
     val group: String,
     @Column(name = "is_active")
     val isActive: Boolean,
-    @Column(name = "created_at")
-    val createdAt: LocalDateTime,
-    @Column(name = "updated_at")
-    val updatedAt: LocalDateTime,
-){
+):BaseTimeEntity()
+{
 
     constructor(request: TagRequest) : this(
         request.id,request.name,request.description,
         request.color,request.category,
-        request.group,request.isActive,
-        LocalDateTime.now(), LocalDateTime.now(),
+        request.group,request.isActive
     )
 
     constructor(original: EmotionTags, request: TagRequest) : this(
         request.id,request.name,request.description,
         request.color,request.category,
-        request.group,request.isActive,
-        original.createdAt, LocalDateTime.now(),
-    )
+        request.group,request.isActive)
 
     constructor(id: Int) : this(
         id = id,
@@ -50,9 +45,7 @@ data class EmotionTags(
         color = "",
         category = "",
         group = "",
-        isActive = true,
-        createdAt = LocalDateTime.now(),
-        updatedAt = LocalDateTime.now()
+        isActive = true
     )
 
 }

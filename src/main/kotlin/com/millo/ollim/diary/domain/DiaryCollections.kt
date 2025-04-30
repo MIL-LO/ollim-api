@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.domain
 
+import com.millo.ollim.common.domain.BaseTimeEntity
 import com.millo.ollim.diary.request.CollectionRequest
 import jakarta.persistence.*
 import java.time.LocalDateTime
@@ -19,14 +20,10 @@ data class DiaryCollections(
     val description: String,
     @Column(name = "sort_order")
     val sortOrder: Int,
-    @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: LocalDateTime,
-    @Column(name = "updated_at")
-    val updatedAt: LocalDateTime,
-
-    ) {
+    ): BaseTimeEntity()
+{
     constructor(request: CollectionRequest, userId: UUID, sortOrder: Int) : this(
         UUID.randomUUID(), userId, request.title, request.description,
-        sortOrder, LocalDateTime.now(), LocalDateTime.now()
+        sortOrder
     )
 }
