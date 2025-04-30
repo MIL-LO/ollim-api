@@ -63,15 +63,19 @@ class DiaryController(
     @PostMapping("/collection")
     fun createCollection(@RequestParam userId: UUID, @RequestBody request: CollectionRequest):ResponseEntity<DiaryCollections> =
         ResponseEntity.ok().body(diaryCollectionsService.createNewCollections(userId,request))
+    // 사용자의 모든 컬렉션 리스트 출력
     @GetMapping("/collections")
     fun getUserCollection(@RequestParam userId: UUID):ResponseEntity<List<DiaryCollections> > =
         ResponseEntity.ok().body(diaryCollectionsService.getUserCollection(userId))
     @PostMapping("/collection/item")
     fun addCollectionItem(@RequestParam userId: UUID, @RequestParam collectionId: UUID, @RequestParam diaryId: UUID):ResponseEntity<DiaryCollectionItems> =
         ResponseEntity.ok().body(diaryCollectionsItemsService.addCollectionItem(userId,collectionId, diaryId))
+    // 한 컬랙션에 해당하는 다이어리 목록 출력
     @GetMapping("/collection/item")
-    fun getUserCollectionItems(@RequestParam userId: UUID, @RequestParam collectionId:UUID): ResponseEntity<List<DiaryCollectionItems>> =
-        ResponseEntity.ok().body(diaryCollectionsItemsService.getUserCollectionItems(userId, collectionId))
-
+    fun getUserCollectionItems(@RequestParam userId: UUID, @RequestParam collectionId:UUID, @RequestParam pageNum: Int): ResponseEntity<List<DiaryCollectionItems>> =
+        ResponseEntity.ok().body(diaryCollectionsItemsService.getUserCollectionItems(userId, collectionId,pageNum))
+    @PutMapping("/collection/item")
+    fun changeCollectionItemsOrder(@RequestParam collectionId: UUID, @RequestParam diaryId1: UUID, @RequestParam diaryId2:UUID)
+    = ResponseEntity.ok().body(diaryCollectionsItemsService.changeOrder(collectionId,diaryId1, diaryId2))
 
 }

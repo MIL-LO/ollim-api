@@ -10,7 +10,7 @@ data class DiaryCollectionItems(
     @EmbeddedId
     val id: DiaryCollectionId,
     @Column(name = "sort_order")
-    val sortOrder: Int,
+    var sortOrder: Int,
     @Column(name = "created_at", nullable = false, updatable = false)
     val createdAt: LocalDateTime,
 ) {
