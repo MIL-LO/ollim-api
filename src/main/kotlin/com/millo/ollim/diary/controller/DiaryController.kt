@@ -38,8 +38,8 @@ class DiaryController(
     fun deleteDiary(@RequestParam userId:UUID, @RequestParam diaryId:UUID): ResponseEntity<String> =
         ResponseEntity.ok().body(diaryService.deleteDiary(userId,diaryId))
     @GetMapping("/list")
-    fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryVO>> =
-        ResponseEntity.ok().body(diaryService.getDiaries(userId))
+    fun getDiaries(@RequestParam userId:UUID, @RequestParam pageNum:Int): ResponseEntity<List<DiaryVO>> =
+        ResponseEntity.ok().body(diaryService.getDiaries(userId, pageNum))
     @GetMapping("")
     fun getDiary(@RequestParam userId: UUID, @RequestParam diaryId: UUID): ResponseEntity<DiaryVO> =
         ResponseEntity.ok().body(diaryService.getDiary(userId,diaryId))

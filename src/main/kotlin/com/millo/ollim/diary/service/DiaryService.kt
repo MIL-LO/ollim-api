@@ -3,14 +3,13 @@ package com.millo.ollim.diary.service
 import com.millo.ollim.diary.domain.DiaryEntries
 import com.millo.ollim.diary.request.DiaryRequest
 import com.millo.ollim.diary.request.UpdateDiary
-import com.millo.ollim.diary.response.DiaryResponse
 import com.millo.ollim.diary.response.DiaryVO
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
-import java.util.Collections
 import java.util.UUID
 
 @Service
@@ -33,9 +32,14 @@ class DiaryService(
     }
 
     @Transactional(readOnly = true)
-    fun getDiaries(userId: UUID): List<DiaryVO> {
+    fun getDiaries(userId: UUID, pageNum:Int): List<DiaryVO> {
         val res:MutableList<DiaryVO> = mutableListOf()
-        val entries = diaryEntriesService.findByUserIdWithIsNotDeleted(userId)
+        if (pageNum<1)
+            throw Exception("page num 1보다 작음")
+
+        val pageRequest = PageRequest.of(pageNum-1, 10, Sort.by("createdAt").descending())
+
+        val entries = diaryEntriesService.findByUserIdWithIsNotDeleted(userId, pageRequest)
 
         entries.forEach { diaryEntry ->
             res.add(DiaryVO(
