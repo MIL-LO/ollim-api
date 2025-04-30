@@ -35,7 +35,7 @@ class DiaryService(
     @Transactional(readOnly = true)
     fun getDiaries(userId: UUID): List<DiaryVO> {
         val res:MutableList<DiaryVO> = mutableListOf()
-        val entries = diaryEntriesService.findByUserId(userId)
+        val entries = diaryEntriesService.findByUserIdWithIsNotDeleted(userId)
 
         entries.forEach { diaryEntry ->
             res.add(DiaryVO(
