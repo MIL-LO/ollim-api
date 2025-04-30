@@ -4,6 +4,7 @@ import com.millo.ollim.diary.domain.DiaryEntries
 import com.millo.ollim.diary.request.DiaryRequest
 import com.millo.ollim.diary.request.UpdateDiary
 import com.millo.ollim.diary.response.DiaryResponse
+import com.millo.ollim.diary.response.DiaryVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
@@ -22,38 +23,38 @@ class DiaryService(
 ) {
 
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
-    fun createNewDiary(userId: UUID, newDiaryRequest: DiaryRequest): DiaryResponse {
+    fun createNewDiary(userId: UUID, newDiaryRequest: DiaryRequest): DiaryVO {
 
         val entry = diaryEntriesService.save(DiaryEntries(userId,newDiaryRequest.mood,newDiaryRequest.emotionTags.toString()))
-        val content = diaryContentsService.save(entry,"contents","img_url");
+        val content = diaryContentsService.save(entry,newDiaryRequest.content,newDiaryRequest.imgUrl);
         val diaryEmotions = diaryEmotionsService.save(entry.id, newDiaryRequest.emotionTags)
 
-        return DiaryResponse(entry,content,diaryEmotions)
+        return DiaryVO(entry,content,diaryEmotions)
     }
 
     @Transactional(readOnly = true)
-    fun getDiaries(userId: UUID): List<DiaryResponse> {
-        val res:MutableList<DiaryResponse> = mutableListOf()
+    fun getDiaries(userId: UUID): List<DiaryVO> {
+        val res:MutableList<DiaryVO> = mutableListOf()
         val entries = diaryEntriesService.findByUserId(userId)
+
         entries.forEach { diaryEntry ->
-            val diaryResponse =DiaryResponse(diaryEntry, diaryContentsService.findByDiaryId(diaryEntry.id),diaryEmotionsService.findByDiaryId(diaryEntry.id))
-            println("diaryResponse = ${diaryResponse}")
-            res.add(diaryResponse)
+            res.add(DiaryVO(
+                diaryEntry,
+                diaryContentsService.findByDiaryId(diaryEntry.id),
+                diaryEmotionsService.findByDiaryId(diaryEntry.id)))
         }
-        println("res = ${res}")
+
         return res
     }
 
     @Transactional(readOnly = false)
-    fun updateDiary(userId: UUID, updateDiary: UpdateDiary): DiaryResponse {
+    fun updateDiary(userId: UUID, updateDiary: UpdateDiary): DiaryVO {
         val diaryEntry:DiaryEntries = diaryEntriesService.findById(updateDiary.diaryId)
         if (diaryEntry.userId != userId) {
             throw Exception("유저 아이디 불일치")
         }
         diaryEntriesService.save(
-            DiaryEntries(userId,updateDiary,diaryEntry.isDeleted,diaryEntry.createdAt,
-                LocalDateTime.now()
-            )
+            DiaryEntries(userId,updateDiary,diaryEntry.isDeleted)
         )
 
         val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,updateDiary.imgUrl)
@@ -65,7 +66,7 @@ class DiaryService(
         diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
         val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)
         println("diaryEmotions = ${diaryEmotions}")
-        return DiaryResponse(diaryEntry,diaryContents, diaryEmotions)
+        return DiaryVO(diaryEntry,diaryContents, diaryEmotions)
     }
 
     @Transactional(readOnly = false)
@@ -74,7 +75,7 @@ class DiaryService(
         // diaryEmotions, diaryCollections, diary_entry, diary_contents
         val diaryEntry = diaryEntriesService.findById(diaryId)
         if (diaryEntry.userId != userId) {
-            return "invalid user id: $diaryId"
+            throw Exception("유저 아이디 불일치")
         }
 
         diaryEmotionsService.deleteByDiaryId(diaryId)
@@ -85,8 +86,15 @@ class DiaryService(
         return "success"
     }
 
-    fun getDiary(userId: UUID, diaryId: UUID): DiaryResponse {
-        return DiaryResponse(diaryEntriesService.findById(diaryId),
+    @Transactional(readOnly = true)
+    fun getDiary(userId: UUID, diaryId: UUID): DiaryVO {
+        val diaryEntry = diaryEntriesService.findById(diaryId)
+
+        if (diaryEntry.userId != userId) {
+            throw Exception("유저 아이디 불일치")
+        }
+
+        return DiaryVO(diaryEntry,
             diaryContentsService.findByDiaryId(diaryId),
             diaryEmotionsService.findByDiaryId(diaryId))
     }

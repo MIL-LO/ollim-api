@@ -8,7 +8,7 @@ import com.millo.ollim.diary.request.CollectionRequest
 import com.millo.ollim.diary.request.DiaryRequest
 import com.millo.ollim.diary.request.TagRequest
 import com.millo.ollim.diary.request.UpdateDiary
-import com.millo.ollim.diary.response.DiaryResponse
+import com.millo.ollim.diary.response.DiaryVO
 import com.millo.ollim.diary.service.DiaryCollectionItemsService
 import com.millo.ollim.diary.service.DiaryCollectionsService
 import com.millo.ollim.diary.service.EmotionTagsService
@@ -30,18 +30,18 @@ class DiaryController(
     // 다이어리 생성, 조회(단일, 목록)수정(수정 시, DiaryEmotions 변경 주의)
     @PostMapping("")
     fun createNewDiary(@RequestParam userId: UUID, @RequestBody newDiaryRequest: DiaryRequest):
-        ResponseEntity<DiaryResponse> = ResponseEntity.ok().body(diaryService.createNewDiary(userId,newDiaryRequest))
+        ResponseEntity<DiaryVO> = ResponseEntity.ok().body(diaryService.createNewDiary(userId,newDiaryRequest))
     @PutMapping("")
-    fun updateDiary(@RequestParam userId: UUID, @RequestBody updateDiary: UpdateDiary): ResponseEntity<DiaryResponse> =
+    fun updateDiary(@RequestParam userId: UUID, @RequestBody updateDiary: UpdateDiary): ResponseEntity<DiaryVO> =
         ResponseEntity.ok().body(diaryService.updateDiary(userId,updateDiary))
     @DeleteMapping("")
     fun deleteDiary(@RequestParam userId:UUID, @RequestParam diaryId:UUID): ResponseEntity<String> =
         ResponseEntity.ok().body(diaryService.deleteDiary(userId,diaryId))
     @GetMapping("/list")
-    fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryResponse>> =
+    fun getDiaries(@RequestParam userId:UUID): ResponseEntity<List<DiaryVO>> =
         ResponseEntity.ok().body(diaryService.getDiaries(userId))
     @GetMapping("")
-    fun getDiary(@RequestParam userId: UUID, @RequestParam diaryId: UUID): ResponseEntity<DiaryResponse> =
+    fun getDiary(@RequestParam userId: UUID, @RequestParam diaryId: UUID): ResponseEntity<DiaryVO> =
         ResponseEntity.ok().body(diaryService.getDiary(userId,diaryId))
 
     // 태그 CRUD
