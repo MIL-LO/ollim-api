@@ -18,7 +18,8 @@ class DiaryEntriesService (@Autowired val diaryEntriesRepository: DiaryEntriesRe
     fun delete(id: UUID) = diaryEntriesRepository.deleteById(id)
 
     @Transactional(readOnly = true)
-    fun findByUserId(id: UUID) = diaryEntriesRepository.findAllByUserId(id)
+    fun findByUserId(id: UUID) = diaryEntriesRepository.findAllByUserIdOrderByCreatedAtDesc(id)
+
     @Transactional
     fun findById(diaryId: UUID): DiaryEntries = diaryEntriesRepository.findById(diaryId).orElseThrow()
 
