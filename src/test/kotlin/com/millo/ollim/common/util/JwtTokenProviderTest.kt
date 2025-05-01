@@ -24,19 +24,21 @@ class JwtTokenProviderTest : StringSpec({
 
     val userId = UUID.randomUUID()
     val role = UserRole.USER
+    val email = "test@example.com"
+    val nickname = "테스트"
 
     "AccessToken을 정상적으로 생성한다" {
-        val token = jwtTokenProvider.generateAccessToken(userId, role)
+        val token = jwtTokenProvider.generateAccessToken(userId, role, email, nickname)
         token.shouldNotBeEmpty()
     }
 
     "RefreshToken을 정상적으로 생성한다" {
-        val token = jwtTokenProvider.generateRefreshToken()
+        val token = jwtTokenProvider.generateRefreshToken(userId)
         token.shouldNotBeEmpty()
     }
 
     "AccessToken을 파싱하여 Claims를 추출할 수 있다" {
-        val token = jwtTokenProvider.generateAccessToken(userId, role)
+        val token = jwtTokenProvider.generateAccessToken(userId, role, email, nickname)
 
         val claims = shouldNotThrowAny {
             jwtTokenProvider.parseClaims(token)
@@ -44,5 +46,17 @@ class JwtTokenProviderTest : StringSpec({
 
         claims.subject shouldBe userId.toString()
         claims["role"] shouldBe role.name
+        claims["email"] shouldBe email
+        claims["nickname"] shouldBe nickname
+    }
+
+    "AccessToken 생성 시 nickname이 null이면 '익명'으로 처리된다" {
+        val token = jwtTokenProvider.generateAccessToken(userId, role, email, null)
+
+        val claims = shouldNotThrowAny {
+            jwtTokenProvider.parseClaims(token)
+        }
+
+        claims["nickname"] shouldBe "익명"
     }
 })
