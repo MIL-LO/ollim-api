@@ -20,12 +20,12 @@ class AppleJwtGenerator(
     @Value("\${oauth.apple.team-id}") private val teamId: String,
     @Value("\${oauth.apple.client-id}") private val clientId: String,
     @Value("\${oauth.apple.key-id}") private val keyId: String,
-    @Value("\${oauth.apple.secret-key-path}") private val secretKeyPath: String
+    @Value("\${oauth.apple.secret-key}") private val secretKey: String
 ) {
     fun generate(): String {
         val now = Instant.now()
         val expiration = now.plusSeconds(60 * 60) // 1시간 유효
-        val privateKey = loadPrivateKey()
+        val privateKey = decodePrivateKey()
 
         return Jwts.builder()
             .setHeaderParam("kid", keyId)
@@ -38,13 +38,12 @@ class AppleJwtGenerator(
             .compact()
     }
 
-    private fun loadPrivateKey(): PrivateKey {
-        val keyContent = Files.readAllLines(Paths.get(secretKeyPath))
-            .filterNot { it.startsWith("-----") || it.isBlank() }
-            .joinToString("")
-        val decoded = Base64.getDecoder().decode(keyContent)
+    /**
+     * Jasypt로 복호화된 base64 문자열을 이용해 PrivateKey 객체를 생성
+     */
+    private fun decodePrivateKey(): PrivateKey {
+        val decoded = Base64.getDecoder().decode(secretKey)
         val keySpec = PKCS8EncodedKeySpec(decoded)
-        val kf = KeyFactory.getInstance("EC")
-        return kf.generatePrivate(keySpec)
+        return KeyFactory.getInstance("EC").generatePrivate(keySpec)
     }
 }
