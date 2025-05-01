@@ -1,6 +1,7 @@
 services:
   ollim-api:
     container_name: springboot
+    image: ollim-api
     build:
       context: .
       dockerfile: Dockerfile
