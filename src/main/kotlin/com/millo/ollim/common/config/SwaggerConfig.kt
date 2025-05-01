@@ -5,15 +5,23 @@ import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.security.SecurityRequirement
 import io.swagger.v3.oas.models.security.SecurityScheme
-import org.springdoc.core.models.GroupedOpenApi
+import io.swagger.v3.oas.models.servers.Server
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.env.Environment
 
 @Configuration
-class SwaggerConfig {
+class SwaggerConfig(val env: Environment) {
 
     @Bean
     fun openAPI(): OpenAPI {
+        val servers = listOf(
+            "SWAGGER_SERVER_LOCAL" to "로컬",
+            "SWAGGER_SERVER_PROD" to "운영",
+            "SWAGGER_SERVER_NGROK" to "NGROK"
+        ).mapNotNull { (envKey, name) ->
+            env.getProperty(envKey)?.let { url -> Server().url(url).description(name) }
+        }
         return OpenAPI()
             .info(
                 Info()
@@ -21,6 +29,7 @@ class SwaggerConfig {
                     .description("감정 다이어리 서비스 올림의 API 문서입니다.")
                     .version("v1.0.0")
             )
+            .servers(servers)
             .components(
                 Components()
                     .addSecuritySchemes(
@@ -36,19 +45,4 @@ class SwaggerConfig {
             )
     }
 
-    @Bean
-    fun v1Api(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("v1")
-            .pathsToMatch("/api/v1/**")
-            .build()
-    }
-
-    @Bean
-    fun halEx(): GroupedOpenApi {
-        return GroupedOpenApi.builder()
-            .group("test")
-            .pathsToMatch("/test/**")
-            .build()
-    }
 }
