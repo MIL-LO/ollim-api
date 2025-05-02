@@ -30,7 +30,7 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     @Comment("계정 상태: ACTIVE(정상), WITHDRAWN(탈퇴) 등")
-    var status: UserStatus = UserStatus.ACTIVE,
+    var status: UserStatus = UserStatus.PENDING,
 
     @Column(name = "last_login_at")
     @Comment("마지막 로그인 시각 (관리자 포함)")
