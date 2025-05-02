@@ -2,6 +2,7 @@ package com.millo.ollim.common.util
 
 import com.millo.ollim.auth.domain.UserPrincipal
 import com.millo.ollim.user.domain.UserRole
+import com.millo.ollim.user.domain.UserStatus
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -16,11 +17,6 @@ import org.springframework.stereotype.Component
 import java.security.Key
 import java.util.*
 
-/**
- * JWT 토큰 발급 및 파싱 유틸리티
- * - AccessToken: 사용자 인증 정보 포함
- * - RefreshToken: userId + type=refresh_token claim 포함
- */
 @Component
 class JwtTokenProvider(
     @Value("\${jwt.secret}") secret: String,
@@ -34,13 +30,20 @@ class JwtTokenProvider(
     /**
      * AccessToken 발급
      */
-    fun generateAccessToken(userId: UUID, role: UserRole, email: String, nickname: String?): String {
+    fun generateAccessToken(
+        userId: UUID,
+        role: UserRole,
+        status: UserStatus,
+        email: String,
+        nickname: String?
+    ): String {
         val now = Date()
         val expiry = Date(now.time + accessTokenExpiration)
 
         return Jwts.builder()
             .setSubject(userId.toString())
             .claim("role", role.name)
+            .claim("status", status.name)
             .claim("email", email)
             .claim("nickname", nickname ?: "익명")
             .setIssuedAt(now)
@@ -50,7 +53,7 @@ class JwtTokenProvider(
     }
 
     /**
-     * RefreshToken 발급 (userId + type=refresh_token)
+     * RefreshToken 발급
      */
     fun generateRefreshToken(userId: UUID): String {
         val now = Date()
@@ -66,31 +69,17 @@ class JwtTokenProvider(
     }
 
     /**
-     * Redis에 RefreshToken 저장 시 사용할 키 생성
-     */
-    fun getRefreshTokenKey(userId: UUID): String {
-        return "refresh_token:$userId"
-    }
-
-    /**
-     * Redis에 AccessToken 블랙리스트 등록 시 사용할 키 생성
-     */
-    fun getBlacklistKey(accessToken: String): String {
-        return "blacklist:$accessToken"
-    }
-
-    /**
-     * AccessToken 기반 인증 객체 복원
+     * 인증 객체 복원
      */
     fun getAuthentication(token: String): UsernamePasswordAuthenticationToken? {
         return try {
             val claims = parseClaims(token)
 
             val userId = UUID.fromString(claims.subject)
-            val roleStr = claims["role"]?.toString() ?: throw IllegalArgumentException("Missing role claim")
-            val role = UserRole.valueOf(roleStr)
+            val role = UserRole.valueOf(claims["role"]?.toString() ?: error("Missing role claim"))
+            val status = UserStatus.valueOf(claims["status"]?.toString() ?: error("Missing status claim"))
             val email = claims["email"]?.toString() ?: "unknown"
-            val nickname = claims["nickname"]?.toString() ?: "익명"
+            val nickname = claims["nickname"]?.toString()
 
             val cleanClaims = claims.filterKeys { it != "iat" && it != "exp" }
 
@@ -103,7 +92,8 @@ class JwtTokenProvider(
             val userPrincipal = UserPrincipal(
                 userId = userId,
                 email = email,
-                role = role.name,
+                role = role,
+                status = status,
                 nickname = nickname,
                 authorities = listOf(SimpleGrantedAuthority("ROLE_${role.name}")),
                 idToken = idToken,
@@ -118,16 +108,34 @@ class JwtTokenProvider(
     }
 
     /**
-     * RefreshToken 여부 확인
+     * Redis 키 생성 유틸
      */
-    fun isRefreshToken(token: String): Boolean {
-        return try {
-            val claims = parseClaims(token)
-            claims["type"] == "refresh_token"
-        } catch (e: Exception) {
-            log.warn("RefreshToken 타입 확인 실패", e)
-            false
-        }
+    fun getRefreshTokenKey(userId: UUID) = "refresh_token:$userId"
+    fun getBlacklistKey(accessToken: String) = "blacklist:$accessToken"
+
+    /**
+     * 유효성 검사
+     */
+    fun validateToken(token: String): Boolean = try {
+        !parseClaims(token).expiration.before(Date())
+    } catch (e: Exception) {
+        log.warn("토큰 유효성 검증 실패", e)
+        false
+    }
+
+    /**
+     * 토큰 만료일 추출
+     */
+    fun getExpiration(token: String): Date = parseClaims(token).expiration
+
+    /**
+     * RefreshToken 여부 검사
+     */
+    fun isRefreshToken(token: String): Boolean = try {
+        parseClaims(token)["type"] == "refresh_token"
+    } catch (e: Exception) {
+        log.warn("RefreshToken 타입 확인 실패", e)
+        false
     }
 
     /**
@@ -135,32 +143,10 @@ class JwtTokenProvider(
      */
     fun getUserIdFromRefreshToken(token: String): UUID {
         val claims = parseClaims(token)
-
         if (claims["type"] != "refresh_token") {
             throw IllegalArgumentException("RefreshToken이 아닙니다.")
         }
-
         return UUID.fromString(claims.subject)
-    }
-
-    /**
-     * JWT 만료 시간 추출
-     */
-    fun getExpiration(token: String): Date {
-        return parseClaims(token).expiration
-    }
-
-    /**
-     * 토큰 유효성 검증
-     */
-    fun validateToken(token: String): Boolean {
-        return try {
-            val claims = parseClaims(token)
-            !claims.expiration.before(Date())
-        } catch (e: Exception) {
-            log.warn("토큰 유효성 검증 실패", e)
-            false
-        }
     }
 
     /**
@@ -168,11 +154,7 @@ class JwtTokenProvider(
      */
     fun parseClaims(token: String): Claims {
         return try {
-            Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .body
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
         } catch (e: Exception) {
             log.warn("토큰 파싱 실패", e)
             throw IllegalArgumentException("유효하지 않은 JWT 토큰입니다.")
