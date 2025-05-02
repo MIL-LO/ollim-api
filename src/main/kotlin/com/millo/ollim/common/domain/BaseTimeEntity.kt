@@ -16,14 +16,14 @@ import java.time.LocalDateTime
 abstract class BaseTimeEntity {
 
     /**
-     * 생성 시각 (등록 시 자동 저장됨)
+     * 생성 시각
      */
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     lateinit var createdAt: LocalDateTime
 
     /**
-     * 수정 시각 (변경 시 자동 갱신됨)
+     * 수정 시각
      */
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)

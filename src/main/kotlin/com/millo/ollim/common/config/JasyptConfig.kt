@@ -10,25 +10,27 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 @EnableEncryptableProperties
-class JasyptConfig {
-
+class JasyptConfig(
     @Value("\${jasypt.encryptor.password}")
-    private val jasyptPassword: String? = null
+    private val jasyptPassword: String
+) {
 
+    /**
+     * 암호화/복호화 처리를 위한 Jasypt StringEncryptor Bean 정의
+     */
     @Bean(name = ["jasyptStringEncryptor"])
     fun stringEncryptor(): StringEncryptor {
-
         val encryptor = PooledPBEStringEncryptor()
-        val config = SimpleStringPBEConfig()
-
-        config.password = jasyptPassword // Jasypt 비밀번호
-        config.algorithm = "PBEWITHHMACSHA512ANDAES_256"
-        config.setKeyObtentionIterations("1000") // 키 획득 반복 횟수 (기본값: 1000)
-        config.setPoolSize("1") // 암호화 풀 크기
-        config.providerName = "SunJCE" // 기본 Java 암호화 제공자 사용
-        config.setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator") // 랜덤 Salt 사용
-        config.setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator") // 랜덤 IV 사용 (AES-256을 위해 필수)
-        config.stringOutputType = "base64" // Base64 형식으로 암호화된 값 저장
+        val config = SimpleStringPBEConfig().apply {
+            password = jasyptPassword
+            algorithm = "PBEWithMD5AndDES"
+            setKeyObtentionIterations("1000")
+            setPoolSize("1")
+            providerName = "SunJCE"
+            setSaltGeneratorClassName("org.jasypt.salt.RandomSaltGenerator")
+            setIvGeneratorClassName("org.jasypt.iv.RandomIvGenerator")
+            stringOutputType = "base64"
+        }
 
         encryptor.setConfig(config)
 

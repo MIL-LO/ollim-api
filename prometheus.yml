@@ -2,12 +2,7 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'app-api'
+  - job_name: 'ollim-api'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:5001']
-
-  - job_name: 'admin-api'
-    metrics_path: '/actuator/prometheus'
-    static_configs:
-      - targets: ['host.docker.internal:5002']
+      - targets: ['ollim-api:5000']

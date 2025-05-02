@@ -3,21 +3,9 @@ server:
 
 spring:
   application:
-    name: service-api
-
+    name: ollim-api
   config:
-    import: optional:file:.env.local[.properties]
-
-
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id: ${CLIENT_ID}
-            client-secret: ${CLIENT_SECRET}
-            scope: ${SCOPE}
-            redirect-uri: ${REDIRECT_URI}
+    import: optional:file:${ENV_FILE:.env.local}[.properties]
 
   datasource:
     url: ${POSTGRES_URL}
@@ -27,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -35,8 +23,12 @@ spring:
 
   data:
     rest:
-      base-path: /api
-
+      base-path: /test
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE}
     mongodb:
       host: ${MONGO_HOST}
       port: ${MONGO_PORT}
@@ -45,27 +37,69 @@ spring:
       database: ${MONGO_DATABASE}
       authentication-database: ${AUTHENTICATION_DATABASE}
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            provider: google
+            client-name: Google
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_URL}
+            scope:
+              - openid
+              - email
+              - profile
+            authorization-grant-type: authorization_code
+          apple:
+            provider: apple
+            client-name: Apple
+            client-id: ${APPLE_CLIENT_ID}
+            client-secret: ${APPLE_CLIENT_SECRET}
+            redirect-uri: ${APPLE_URL}
+            scope:
+              - openid
+              - email
+              - name
+            authorization-grant-type: authorization_code
+            client-authentication-method: "client_secret_post"
+        provider:
+          apple:
+            authorization-uri: https://appleid.apple.com/auth/authorize?response_mode=form_post
+            token-uri: https://appleid.apple.com/auth/token
+            jwk-set-uri: https://appleid.apple.com/auth/keys
+            user-name-attribute: sub
+oauth:
+  apple:
+    client-id: ${APPLE_CLIENT_ID}
+    team-id: ${APPLE_TEAM_ID}
+    key-id: ${APPLE_KEY_ID}
+    secret-key: ${APPLE_PRIVATE_KEY}
+
 jasypt:
   encryptor:
     password: ${JASYPT_ENCRYPTOR_PASSWORD}
 
-database:
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
-    password: ${REDIS_PASSWORD}
-    database: ${REDIS_DATABASE}
 
 springdoc:
-  api-docs:
-    path: /api-docs
   swagger-ui:
-    path: /swagger-ui
+    path: /ollim-api
     operations-sorter: method
-    oauth:
-      client-id: ENC(WYlgpuOiGMJ1O2UUBxiQTmU4n50-jYSGOy7az1c262+yyPsDcDD1wr+cjxLq+NEGBpHyiXOsAbDf3I110CMPPlvry3zn29kk13xqpeyRpVd6wfBoNaIrEspCaERnp8eteNb5Q3CMqlMXe/vsZgAxuBg==)
-      client-secret: ENC(77K6sNM0WzQeON7VggZXZaQ+oocL3N+HjjT1hPxXmIPeePkcNpXY8kjv2WmnMVCYznMBMxpZ34hSWHxp+sYKSOtkHQNl8hTTgkTq3KmmQnE=)
-      use-basic-authentication-with-access-code-grant: true
+    display-request-duration: true
+    persist-authorization: true
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+
+swagger:
+  servers:
+    local: ${SWAGGER_SERVER_PROD}
+    prod: ${SWAGGER_SERVER_NGROK}
+    ngrok: ${SWAGGER_SERVER_LOCAL}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
 
 management:
   endpoints:
@@ -90,3 +124,11 @@ jwt:
   secret: ${JWT_SECRET}
   access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRED}
   refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRED}
+
+logging:
+  level:
+    com.millo.ollim.auth: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
