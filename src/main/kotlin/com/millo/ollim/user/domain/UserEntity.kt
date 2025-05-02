@@ -38,7 +38,7 @@ class UserEntity(
 
     @Column(name = "withdrawn_at")
     @Comment("계정 탈퇴 처리 일시 (soft delete 용도)")
-    val withdrawnAt: LocalDateTime? = null,
+    var withdrawnAt: LocalDateTime? = null,
 
     /**
      * 사용자 프로필 - 1:1 관계, 사용자 저장 시 자동 cascade
