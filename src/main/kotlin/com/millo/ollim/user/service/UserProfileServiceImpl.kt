@@ -15,34 +15,39 @@ class UserProfileServiceImpl(
     private val userProfileRepository: UserProfileRepository
 ) : UserProfileService {
     @Transactional
-    override fun createOrUpdateProfile(userId: UUID, request: UserProfileDTO.Request) {
+    override fun createOrUpdateProfile(userId: UUID, userProfileRequest: UserProfileDTO.UserProfileRequest) {
         val user = userRepository.findById(userId)
-            .orElseThrow{IllegalArgumentException("사용자를 찾을 수 없습니다. id=$userId")}
+            .orElseThrow { IllegalArgumentException("사용자를 찾을 수 없습니다. id=$userId") }
 
         val profile = user.profile?.apply {
-            nickname = request.nickname
-            gender = request.gender
-            birthDate = request.birthDate
-            energyType = request.energyType
-            activeTime = request.activeTime
-            activitySpaces = request.activitySpaces
-            mbti = request.mbti
-            profileImage = request.profileImage
+            nickname = userProfileRequest.nickname
+            gender = userProfileRequest.gender
+            birthDate = userProfileRequest.birthDate
+            energyType = userProfileRequest.energyType
+            activeTime = userProfileRequest.activeTime
+            activitySpaces = userProfileRequest.activitySpaces
+            mbti = userProfileRequest.mbti
+            profileImage = userProfileRequest.profileImage
         } ?: UserProfileEntity(
             userId = userId,
             user = user,
-            nickname = request.nickname,
-            gender = request.gender,
-            birthDate = request.birthDate,
-            energyType = request.energyType,
-            activeTime = request.activeTime,
-            activitySpaces = request.activitySpaces,
-            mbti = request.mbti,
-            profileImage = request.profileImage
+            nickname = userProfileRequest.nickname,
+            gender = userProfileRequest.gender,
+            birthDate = userProfileRequest.birthDate,
+            energyType = userProfileRequest.energyType,
+            activeTime = userProfileRequest.activeTime,
+            activitySpaces = userProfileRequest.activitySpaces,
+            mbti = userProfileRequest.mbti,
+            profileImage = userProfileRequest.profileImage
         )
 
         user.profile = profile
-        user.status = UserStatus.ACTIVE
+
+        // 상태가 PENDING일 때만 ACTIVE로 전환
+        if (user.status == UserStatus.PENDING) {
+            user.status = UserStatus.ACTIVE
+        }
+
         userProfileRepository.save(profile)
         userRepository.save(user)
     }
