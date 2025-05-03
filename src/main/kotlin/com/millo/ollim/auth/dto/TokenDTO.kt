@@ -1,5 +1,6 @@
 package com.millo.ollim.auth.dto
 
+import com.millo.ollim.user.domain.UserStatus
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.NotBlank
 
@@ -11,8 +12,8 @@ class TokenDTO {
     /**
      * RefreshToken 기반 AccessToken 재발급 요청 DTO
      */
-    @Schema(name = "TokenDTO.Request", description = "AccessToken 재발급 요청 DTO")
-    data class Request(
+    @Schema(description = "AccessToken 재발급 요청 DTO")
+    data class TokenRequest(
 
         @field:NotBlank
         @field:Schema(
@@ -26,19 +27,25 @@ class TokenDTO {
     /**
      * AccessToken / RefreshToken 응답 DTO
      */
-    @Schema(name = "TokenDTO.Response", description = "JWT 토큰 응답 DTO")
-    data class Response(
+    @Schema(description = "JWT 토큰 응답 DTO")
+    data class TokenResponse(
 
         @field:Schema(
             description = "Access Token",
-            example = "eyJhbGciOiJIUzI1NiJ9"
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
         )
         val accessToken: String,
 
         @field:Schema(
             description = "Refresh Token",
-            example = "aef0d019-4535-421f-bc0f-1dd18e0706d1",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
         )
-        val refreshToken: String
+        val refreshToken: String,
+
+        @field:Schema(
+            description = "사용자 상태",
+            example = "ACTIVE"
+        )
+        val status: UserStatus
     )
 }

@@ -11,8 +11,8 @@ interface RefreshTokenService {
      * 클라이언트로부터 전달받은 refreshToken을 검증하여
      * 새로운 AccessToken과 RefreshToken을 발급한다.
      *
-     * @param request RefreshToken 요청 정보
+     * @param tokenRequest RefreshToken 요청 정보
      * @return AccessToken과 새로 발급한 RefreshToken 응답
      */
-    fun reissueAccessToken(request: TokenDTO.Request): TokenDTO.Response
+    fun reissueAccessToken(tokenRequest: TokenDTO.TokenRequest): TokenDTO.TokenResponse
 }

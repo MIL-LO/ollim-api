@@ -1,5 +1,7 @@
 package com.millo.ollim.auth.domain
 
+import com.millo.ollim.user.domain.UserRole
+import com.millo.ollim.user.domain.UserStatus
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.core.oidc.OidcIdToken
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
@@ -12,7 +14,9 @@ import java.util.*
  */
 data class UserPrincipal(
     val userId: UUID,
-    @get:JvmName("email") val email: String, val role: String,
+    @get:JvmName("email") val email: String,
+    val role: UserRole,
+    val status: UserStatus,
     val nickname: String? = null,
     private val authorities: Collection<GrantedAuthority>,
     private val idToken: OidcIdToken,
@@ -25,6 +29,7 @@ data class UserPrincipal(
         put("userId", userId.toString())
         put("email", email)
         put("role", role)
+        put("status", status)
         put("nickname", nickname ?: "익명")
     }
 
