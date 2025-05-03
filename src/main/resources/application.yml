@@ -4,7 +4,6 @@ server:
 spring:
   application:
     name: ollim-api
-
   config:
     import: optional:file:${ENV_FILE:.env.local}[.properties]
 
@@ -16,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -47,7 +46,7 @@ spring:
             client-name: Google
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/google
+            redirect-uri: ${GOOGLE_URL}
             scope:
               - openid
               - email
@@ -58,7 +57,7 @@ spring:
             client-name: Apple
             client-id: ${APPLE_CLIENT_ID}
             client-secret: ${APPLE_CLIENT_SECRET}
-            redirect-uri: https://d6e0-2406-5900-107a-ae19-55d-dd92-a439-ffc3.ngrok-free.app/login/oauth2/code/apple
+            redirect-uri: ${APPLE_URL}
             scope:
               - openid
               - email
@@ -76,7 +75,7 @@ oauth:
     client-id: ${APPLE_CLIENT_ID}
     team-id: ${APPLE_TEAM_ID}
     key-id: ${APPLE_KEY_ID}
-    secret-key-path: ${APPLE_PRIVATE_KEY_PATH}
+    secret-key: ${APPLE_PRIVATE_KEY}
 
 jasypt:
   encryptor:
@@ -84,11 +83,23 @@ jasypt:
 
 
 springdoc:
-  api-docs:
-    path: /api-docs
   swagger-ui:
-    path: /swagger-ui
+    path: /ollim-api
     operations-sorter: method
+    display-request-duration: true
+    persist-authorization: true
+  api-docs:
+    path: /v3/api-docs
+  default-produces-media-type: application/json
+
+swagger:
+  servers:
+    local: ${SWAGGER_SERVER_PROD}
+    prod: ${SWAGGER_SERVER_NGROK}
+    ngrok: ${SWAGGER_SERVER_LOCAL}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}
 
 management:
   endpoints:

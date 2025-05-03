@@ -57,7 +57,8 @@ class UserProfileEntity(
 
     @Column(name = "mbti", length = 4)
     @Comment("MBTI 성격유형")
-    var mbti: String? = null,
+    @Enumerated(EnumType.STRING)
+    var mbti: UserMBTI? = null,
 
     @Column(name = "profile_image", columnDefinition = "TEXT")
     @Comment("감정 캐릭터 이미지 URL, ENUM사용 고려")

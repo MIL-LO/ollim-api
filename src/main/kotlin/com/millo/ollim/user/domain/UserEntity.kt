@@ -30,7 +30,7 @@ class UserEntity(
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     @Comment("계정 상태: ACTIVE(정상), WITHDRAWN(탈퇴) 등")
-    var status: UserStatus = UserStatus.ACTIVE,
+    var status: UserStatus = UserStatus.PENDING,
 
     @Column(name = "last_login_at")
     @Comment("마지막 로그인 시각 (관리자 포함)")
@@ -38,7 +38,7 @@ class UserEntity(
 
     @Column(name = "withdrawn_at")
     @Comment("계정 탈퇴 처리 일시 (soft delete 용도)")
-    val withdrawnAt: LocalDateTime? = null,
+    var withdrawnAt: LocalDateTime? = null,
 
     /**
      * 사용자 프로필 - 1:1 관계, 사용자 저장 시 자동 cascade

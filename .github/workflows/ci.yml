@@ -1,5 +1,6 @@
 name: CI with Gradle
 
+# dev 또는 main 브랜치로 PR이 들어올 때 실행
 on:
   pull_request:
     branches: [ "dev", "main" ]
@@ -11,10 +12,10 @@ jobs:
       contents: read
 
     steps:
-      # GitHub 리포지토리 checkout
+      # GitHub 리포지토리 체크아웃
       - uses: actions/checkout@v4
 
-      # JDK 17 설정
+      # JDK 17 (Amazon Corretto) 설치 및 Gradle 캐시 설정
       - name: Set up JDK 17 with Corretto
         uses: actions/setup-java@v4
         with:
@@ -22,7 +23,7 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
-      # Gradle 설정
+      # Gradle wrapper 설정
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
@@ -30,45 +31,49 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # .env.local 파일 생성 및 PostgreSQL 주소를 localhost로 패치
+      # CI 실행을 위한 .env.local 생성 (base64 인코딩된 시크릿 복호화)
       - name: Create .env.local file for CI
         run: |
           echo "${{ secrets.ENV_LOCAL }}" | base64 --decode > .env.local
           sed -i 's/jdbc:postgresql:\/\/postgres/jdbc:postgresql:\/\/localhost/' .env.local
-          echo "✅ .env.local file created and patched for localhost DB"
-      
-      # .env.docker 파일 생성 (docker-compose용 환경변수)
-      - name: Create .env.docker file for docker compose
+          echo ".env.local created and patched"
+
+      # Docker Compose 환경용 .env.docker 파일 생성
+      - name: Create .env.docker file for docker-compose
         run: |
           echo "${{ secrets.ENV_DOCKER }}" | base64 --decode > .env.docker
-          echo "✅ .env.docker file created for docker compose"
+          echo ".env.docker created"
 
-      # Docker Compose 실행
+      # Docker Compose로 전체 서비스 시작
       - name: Start Docker Compose Services
         run: |
           docker compose --env-file .env.docker up -d
-          echo "⏳ Waiting for containers to be healthy..."
+          echo "Waiting for containers to be ready..."
 
-      # PostgreSQL이 준비될 때까지 대기
+      # PostgreSQL 컨테이너가 정상 작동할 때까지 대기
       - name: Wait for PostgreSQL to be ready
         run: |
           for i in {1..10}; do
-            docker exec $(docker ps -qf "name=postgres") pg_isready -U millo && break
-            echo "⏳ Waiting for postgres..."
-            sleep 3
+            container_id=$(docker ps -qf "name=postgres")
+            if [ -n "$container_id" ] && docker exec "$container_id" pg_isready -U "${POSTGRES_USERNAME:-millo}"; then
+              echo "PostgreSQL is ready"
+              break
+            fi
+            echo "Waiting for PostgreSQL..."
+            sleep 5
           done
 
-      # Gradle 빌드 및 테스트 실행
+      # Gradle 빌드 및 테스트 실행 (Sentry 토큰 포함)
       - name: Build and Test with Gradle
         run: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }} ./gradlew clean build
 
-      # 테스트 실패 시 리포트 업로드
+      # 테스트 실패 시 테스트 리포트 업로드
       - name: Upload Test Report on Failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-report
-          path: service-api/build/reports/tests/test
+          path: build/reports/tests/test
 
   dependency-submission:
     needs: build-and-test
@@ -77,8 +82,10 @@ jobs:
       contents: write
 
     steps:
+      # 의존성 제출용 코드 체크아웃
       - uses: actions/checkout@v4
 
+      # 의존성 그래프 생성을 위한 Java 설정
       - name: Setup Java 17 with Corretto for dependency submission
         uses: actions/setup-java@v4
         with:
@@ -86,5 +93,6 @@ jobs:
           distribution: 'corretto'
           cache: 'gradle'
 
+      # 의존성 그래프 생성 및 GitHub에 제출
       - name: Generate and submit dependency graph
         uses: gradle/actions/dependency-submission@417ae3ccd767c252f5661f1ace9f835f9654f2b5

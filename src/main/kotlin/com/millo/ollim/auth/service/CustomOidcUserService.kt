@@ -21,8 +21,9 @@ class CustomOidcUserService(
 
     override fun loadUser(userRequest: OidcUserRequest): OidcUser {
         val oidcUser = super.loadUser(userRequest)
-
         val registrationId = userRequest.clientRegistration.registrationId.lowercase()
+
+        // Provider별 사용자 정보 매핑
         val userInfo: OAuthUserInfo = when (registrationId) {
             "google" -> GoogleUserInfo(
                 providerId = oidcUser.attributes["sub"] as String,
@@ -37,15 +38,18 @@ class CustomOidcUserService(
             else -> throw IllegalArgumentException("지원하지 않는 소셜 로그인입니다. [$registrationId]")
         }
 
+        // 사용자 저장 및 갱신
         val user = authService.saveOrUpdateUser(userInfo)
 
+        // 인증 객체 반환 (role, status는 enum으로 직접 전달)
         return UserPrincipal(
             userId = user.id,
             email = user.email,
-            role = user.role.name,
+            role = user.role,
+            status = user.status,
             nickname = user.profile?.nickname,
-            authorityList = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}")),
-            idToken = oidcUser.idToken,
+            authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}")),
+            idToken = oidcUser.idToken ?: throw IllegalStateException("OIDC ID Token이 존재하지 않습니다."),
             userInfo = oidcUser.userInfo ?: OidcUserInfo(oidcUser.attributes)
         )
     }
