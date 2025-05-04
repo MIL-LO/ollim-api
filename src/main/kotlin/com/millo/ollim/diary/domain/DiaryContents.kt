@@ -1,6 +1,5 @@
 package com.millo.ollim.diary.domain
 
-import com.millo.ollim.diary.request.UpdateDiary
 import jakarta.persistence.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
@@ -11,7 +10,7 @@ import java.util.*
 data class DiaryContents(
     @Id
     @Field(name = "_id")
-    var id: String,
+    val id: String,
     @Field(name = "user_id")
     var userId: String,
     @Field(name = "content")

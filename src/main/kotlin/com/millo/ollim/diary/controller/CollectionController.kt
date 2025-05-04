@@ -19,7 +19,6 @@ class CollectionController(
     @Autowired val diaryCollectionItemsService: DiaryCollectionItemsService
 ) {
 
-
     @PostMapping("")
     @Operation(summary = "컬렉션 생성", description = "새로운 컬렉션을 생성합니다.",)
     fun createCollection(

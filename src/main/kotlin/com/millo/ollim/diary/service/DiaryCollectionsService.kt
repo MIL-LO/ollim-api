@@ -3,7 +3,7 @@ package com.millo.ollim.diary.service
 import com.millo.ollim.diary.domain.DiaryCollections
 import com.millo.ollim.diary.repository.DiaryCollectionsRepository
 import com.millo.ollim.diary.dto.CollectionDTO
-import com.millo.ollim.diary.response.DiaryVO
+import com.millo.ollim.diary.dto.DiaryDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -46,7 +46,7 @@ class DiaryCollectionsService(
     @Transactional(readOnly = true)
     fun getCollectionDetail(userId: UUID, collectionId: UUID): CollectionDTO.CollectionDetailResponse {
         val diaryCollections:DiaryCollections =diaryCollectionsRepository.findByCollectionId(collectionId)
-        val diaries = mutableListOf<DiaryVO>()
+        val diaries = mutableListOf<DiaryDTO.DiaryResponse>()
         diaryCollections.item.forEach { obj->
             diaries.add(diaryService.getDiaryResponse(obj.diary))
         }

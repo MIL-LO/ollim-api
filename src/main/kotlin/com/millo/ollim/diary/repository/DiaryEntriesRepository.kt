@@ -8,7 +8,5 @@ import java.util.UUID
 
 @Repository
 interface DiaryEntriesRepository: JpaRepository<DiaryEntries, UUID> {
-    fun findAllById(id: UUID): MutableList<DiaryEntries>
-    fun findAllByUserId(id: UUID): MutableList<DiaryEntries>
     fun findAllByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(id: UUID, pageRequest: PageRequest): MutableList<DiaryEntries>
 }
