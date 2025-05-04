@@ -1,7 +1,7 @@
 package com.millo.ollim.diary.domain
 
 import com.millo.ollim.common.domain.BaseTimeEntity
-import com.millo.ollim.diary.request.TagDTO
+import com.millo.ollim.diary.dto.TagDTO
 import jakarta.persistence.*
 
 @Entity

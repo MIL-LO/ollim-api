@@ -8,5 +8,5 @@ import java.util.UUID
 @Repository
 interface DiaryCollectionsRepository: JpaRepository<DiaryCollections,UUID> {
     fun findAllByUserId(userId: UUID): List<DiaryCollections>
-
+    fun findByCollectionId(collectionId: UUID): DiaryCollections
 }

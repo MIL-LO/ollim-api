@@ -2,7 +2,7 @@ package com.millo.ollim.diary.service
 
 import com.millo.ollim.diary.domain.EmotionTags
 import com.millo.ollim.diary.repository.EmotionTagsRepository
-import com.millo.ollim.diary.request.TagDTO
+import com.millo.ollim.diary.dto.TagDTO
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

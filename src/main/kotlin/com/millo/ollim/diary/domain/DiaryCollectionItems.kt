@@ -9,6 +9,12 @@ import java.util.*
 data class DiaryCollectionItems(
     @EmbeddedId
     val id: DiaryCollectionId,
+
+    @MapsId("diaryId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id")
+    val diary: DiaryEntries,
+
     @Column(name = "sort_order")
     var sortOrder: Int,
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -16,6 +22,7 @@ data class DiaryCollectionItems(
 ) {
     constructor(diaryId:UUID, collectionId:UUID,sortOrder: Int) : this(
         DiaryCollectionId(diaryId,collectionId),
+        DiaryEntries(diaryId),
         sortOrder,
         LocalDateTime.now()
     )

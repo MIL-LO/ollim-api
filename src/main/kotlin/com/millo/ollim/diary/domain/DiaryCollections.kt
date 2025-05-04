@@ -1,9 +1,8 @@
 package com.millo.ollim.diary.domain
 
 import com.millo.ollim.common.domain.BaseTimeEntity
-import com.millo.ollim.diary.request.CollectionRequest
+import com.millo.ollim.diary.dto.CollectionDTO
 import jakarta.persistence.*
-import java.time.LocalDateTime
 import java.util.*
 
 @Entity
@@ -11,19 +10,25 @@ import java.util.*
 data class DiaryCollections(
     @Id
     @Column(name = "id", nullable = false,updatable = false)
-    val id: UUID,
+    val collectionId: UUID,
     @Column(name = "user_id", nullable = false, updatable = false)
     val userId: UUID,
+
     @Column(name = "title")
-    val title: String,
+    var title: String,
     @Column(name = "description")
-    val description: String,
+    var description: String,
     @Column(name = "sort_order")
-    val sortOrder: Int,
+    var sortOrder: Int,
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_collection_id")
+    var item: List<DiaryCollectionItems>
+
     ): BaseTimeEntity()
+
 {
-    constructor(request: CollectionRequest, userId: UUID, sortOrder: Int) : this(
-        UUID.randomUUID(), userId, request.title, request.description,
-        sortOrder
+    constructor(createRequest: CollectionDTO.CreateRequest, userId: UUID, sortOrder: Int) : this(
+        UUID.randomUUID(), userId, createRequest.title, createRequest.description,
+        sortOrder, emptyList()
     )
 }

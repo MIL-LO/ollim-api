@@ -1,7 +1,7 @@
 package com.millo.ollim.diary.controller
 
 import com.millo.ollim.common.enums.Versions
-import com.millo.ollim.diary.request.TagDTO
+import com.millo.ollim.diary.dto.TagDTO
 import com.millo.ollim.diary.service.EmotionTagsService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

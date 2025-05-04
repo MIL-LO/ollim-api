@@ -2,6 +2,7 @@ package com.millo.ollim.diary.service
 
 import com.millo.ollim.diary.domain.DiaryCollectionId
 import com.millo.ollim.diary.domain.DiaryCollectionItems
+import com.millo.ollim.diary.dto.CollectionDTO
 import com.millo.ollim.diary.repository.DiaryCollectionItemsRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -14,19 +15,23 @@ import java.util.*
 class DiaryCollectionItemsService(
     @Autowired val diaryCollectionItemsRepository: DiaryCollectionItemsRepository
 ) {
-    @Transactional
-    fun addCollectionItem(userId: UUID,collectionId: UUID, diaryId: UUID): DiaryCollectionItems {
-        val items:List<DiaryCollectionItems> = diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(collectionId)
-        if (items.isEmpty()) {
-            return diaryCollectionItemsRepository.save(DiaryCollectionItems(diaryId,collectionId,0))
-        }
-        return diaryCollectionItemsRepository.save(DiaryCollectionItems(diaryId,collectionId,items.size))
+
+    @Transactional(readOnly = false)
+    fun addCollectionItem(userId: UUID, request: CollectionDTO.AddItemRequest) {
+        val items:List<DiaryCollectionItems> = diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(request.collectionId)
+
+        diaryCollectionItemsRepository.save(DiaryCollectionItems(request.diaryId,request.collectionId,items.size))
     }
+
+
     @Transactional(readOnly = true)
     fun getUserCollectionItems(userId: UUID, collectionId: UUID, pageNum:Int): List<DiaryCollectionItems> {
         val pageRequest = PageRequest.of(pageNum, 10, Sort.by("sortOrder").ascending())
 
         return diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(collectionId,pageRequest)
+//        return diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(collectionId,pageRequest).map {
+//            item-> CollectionDTO.ItemResponse(item)
+//        }
     }
 
     @Transactional(readOnly = false)

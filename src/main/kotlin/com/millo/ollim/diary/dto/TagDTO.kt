@@ -1,4 +1,4 @@
-package com.millo.ollim.diary.request
+package com.millo.ollim.diary.dto
 
 import com.millo.ollim.diary.domain.EmotionTags
 import io.swagger.v3.oas.annotations.media.Schema

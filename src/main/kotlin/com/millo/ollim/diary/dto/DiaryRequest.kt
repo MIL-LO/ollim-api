@@ -1,4 +1,4 @@
-package com.millo.ollim.diary.request
+package com.millo.ollim.diary.dto
 
 
 

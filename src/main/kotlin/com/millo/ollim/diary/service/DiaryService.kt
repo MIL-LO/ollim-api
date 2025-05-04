@@ -1,8 +1,8 @@
 package com.millo.ollim.diary.service
 
 import com.millo.ollim.diary.domain.DiaryEntries
-import com.millo.ollim.diary.request.DiaryRequest
-import com.millo.ollim.diary.request.UpdateDiary
+import com.millo.ollim.diary.dto.DiaryRequest
+import com.millo.ollim.diary.dto.UpdateDiary
 import com.millo.ollim.diary.response.DiaryVO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -16,9 +16,9 @@ import java.util.UUID
 class DiaryService(
     @Autowired val diaryEntriesService: DiaryEntriesService,
     @Autowired val diaryContentsService: DiaryContentsService,
-    @Autowired val emotionTagsService: EmotionTagsService,
     @Autowired val diaryEmotionsService: DiaryEmotionsService,
     @Autowired val diaryCollectionItemsService: DiaryCollectionItemsService,
+
 ) {
 
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
@@ -42,14 +42,18 @@ class DiaryService(
         val entries = diaryEntriesService.findByUserIdWithIsNotDeleted(userId, pageRequest)
 
         entries.forEach { diaryEntry ->
-            res.add(DiaryVO(
-                diaryEntry,
-                diaryContentsService.findByDiaryId(diaryEntry.id),
-                diaryEmotionsService.findByDiaryId(diaryEntry.id)))
+            res.add(getDiaryResponse(diaryEntry))
         }
 
         return res
     }
+
+    // 다이어리 응답 객체 생성
+    fun getDiaryResponse(diaryEntry: DiaryEntries) = DiaryVO(
+        diaryEntry,
+        diaryContentsService.findByDiaryId(diaryEntry.id),
+        diaryEmotionsService.findByDiaryId(diaryEntry.id)
+    )
 
     @Transactional(readOnly = false)
     fun updateDiary(userId: UUID, updateDiary: UpdateDiary): DiaryVO {
@@ -76,7 +80,7 @@ class DiaryService(
     @Transactional(readOnly = false)
     fun deleteDiary(userId: UUID, diaryId: UUID): String {
         // diary 연결된 놈들
-        // diaryEmotions, diaryCollections, diary_entry, diary_contents
+        // diaryEmotions, diaryCollections, diary_entry, diary_contents, diary_collection_items
         val diaryEntry = diaryEntriesService.findById(diaryId)
         if (diaryEntry.userId != userId) {
             throw Exception("유저 아이디 불일치")
@@ -102,4 +106,5 @@ class DiaryService(
             diaryContentsService.findByDiaryId(diaryId),
             diaryEmotionsService.findByDiaryId(diaryId))
     }
+
 }
