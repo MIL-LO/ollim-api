@@ -1,9 +1,8 @@
 package com.millo.ollim.diary.domain
 
 import com.millo.ollim.common.domain.BaseTimeEntity
-import com.millo.ollim.diary.request.TagRequest
+import com.millo.ollim.diary.request.TagDTO
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(name = "emotion_tags")
@@ -27,25 +26,19 @@ data class EmotionTags(
 ):BaseTimeEntity()
 {
 
-    constructor(request: TagRequest) : this(
+    constructor(request: TagDTO.UpdateRequest) : this(
         request.id,request.name,request.description,
         request.color,request.category,
         request.group,request.isActive
     )
-
-    constructor(original: EmotionTags, request: TagRequest) : this(
-        request.id,request.name,request.description,
+    constructor(request: TagDTO.CreateRequest) : this(
+        0,request.name,request.description,
         request.color,request.category,
-        request.group,request.isActive)
+        request.group,true
+    )
 
-    constructor(id: Int) : this(
-        id = id,
-        name = "",
-        description = "",
-        color = "",
-        category = "",
-        group = "",
-        isActive = true
+    constructor(tagId: Int) : this(
+        tagId,"","","","","",false
     )
 
 }
