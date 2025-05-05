@@ -5,7 +5,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "prohibited_words")
-data class ProhibitedWords(
+data class ProhibitedWordEntity(
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

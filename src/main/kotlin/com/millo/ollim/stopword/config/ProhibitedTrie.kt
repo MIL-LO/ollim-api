@@ -1,6 +1,6 @@
 package com.millo.ollim.stopword.config
 
-class Aho {
+class ProhibitedTrie {
 
     data class Trie(
         var child:MutableMap<Char,Trie>,
