@@ -1,8 +1,8 @@
 package com.millo.ollim.diary.dto
 
-import com.millo.ollim.diary.domain.DiaryContents
-import com.millo.ollim.diary.domain.DiaryEmotions
-import com.millo.ollim.diary.domain.DiaryEntries
+import com.millo.ollim.diary.domain.DiaryContentEntity
+import com.millo.ollim.diary.domain.DiaryEmotionEntity
+import com.millo.ollim.diary.domain.DiaryEntryEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.*
 
@@ -39,9 +39,9 @@ class DiaryDTO{
         val mood: String,
         val emotionsTags: List<EmotionTag>
     ){
-        constructor(diaryEntries: DiaryEntries, diaryContents: DiaryContents, diaryEmotions: List<DiaryEmotions>):this(
-            diaryEntries.id, diaryContents.content, diaryContents.imageUrl, diaryEntries.mood,
-            diaryEmotions.map{ EmotionTag(it.id.tagId,it.emotionTag.id, it.emotionTag.name)}
+        constructor(diaryEntriesEntity: DiaryEntryEntity, diaryContentEntity: DiaryContentEntity, diaryEmotionEntities: List<DiaryEmotionEntity>):this(
+            diaryEntriesEntity.id, diaryContentEntity.content, diaryContentEntity.imageUrl, diaryEntriesEntity.mood,
+            diaryEmotionEntities.map{ EmotionTag(it.id.tagId,it.emotionTag.id, it.emotionTag.name)}
         )
     }
 

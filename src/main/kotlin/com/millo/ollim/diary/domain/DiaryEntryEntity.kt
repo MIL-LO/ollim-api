@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity
 @Table(name = "diary_entries")
-data class DiaryEntries(
+data class DiaryEntryEntity(
     @Id
     @Column(name = "id", nullable = false)
     val id: UUID,

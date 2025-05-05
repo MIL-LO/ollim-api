@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.service
 
-import com.millo.ollim.diary.domain.EmotionTags
+import com.millo.ollim.diary.domain.EmotionTagEntity
 import com.millo.ollim.diary.repository.EmotionTagsRepository
 import com.millo.ollim.diary.dto.TagDTO
 import jakarta.persistence.EntityNotFoundException
@@ -18,7 +18,7 @@ class EmotionTagsService(
     fun createNewTag(request: TagDTO.CreateRequest){
         if(emotionTagsRepository.existsByName(request.name))
             throw Exception("This tag name is already exists.")
-        emotionTagsRepository.save(EmotionTags(request))
+        emotionTagsRepository.save(EmotionTagEntity(request))
     }
 
     // 감정 태그는 전체 조회 될 것이라는 가정
@@ -31,7 +31,7 @@ class EmotionTagsService(
     fun updateTag(request: TagDTO.UpdateRequest) {
         if (!emotionTagsRepository.existsById(request.id))
             throw EntityNotFoundException()
-        emotionTagsRepository.save(EmotionTags(request))
+        emotionTagsRepository.save(EmotionTagEntity(request))
     }
 
     // 삭제할 때, 다이어리와 연결된 태그 전부 제거 필요

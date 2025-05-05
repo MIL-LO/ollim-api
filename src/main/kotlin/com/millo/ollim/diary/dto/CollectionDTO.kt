@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.dto
 
-import com.millo.ollim.diary.domain.DiaryCollections
+import com.millo.ollim.diary.domain.DiaryCollectionEntity
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.*
 
@@ -39,7 +39,7 @@ class CollectionDTO {
         val sortOrder: Int,
         val itemCount: Int
     ) {
-        constructor(collection: DiaryCollections) : this(
+        constructor(collection: DiaryCollectionEntity) : this(
             collection.collectionId,
             collection.title,
             collection.description,
@@ -55,7 +55,7 @@ class CollectionDTO {
         val sortOrder: Int,
         val item:List<DiaryDTO.DiaryResponse>
     ) {
-        constructor(collection: DiaryCollections, diary: MutableList<DiaryDTO.DiaryResponse>) : this(
+        constructor(collection: DiaryCollectionEntity, diary: MutableList<DiaryDTO.DiaryResponse>) : this(
             collection.collectionId, collection.title, collection.description,
             collection.sortOrder, diary
         )

@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.service
 
-import com.millo.ollim.diary.domain.DiaryCollectionItems
+import com.millo.ollim.diary.domain.DiaryCollectionItemEntity
 import com.millo.ollim.diary.dto.CollectionDTO
 import com.millo.ollim.diary.repository.DiaryCollectionItemsRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,9 +15,9 @@ class DiaryCollectionItemsService(
 
     @Transactional(readOnly = false)
     fun addCollectionItem(userId: UUID, request: CollectionDTO.AddItemRequest) {
-        val items:List<DiaryCollectionItems> = diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(request.collectionId)
+        val items:List<DiaryCollectionItemEntity> = diaryCollectionItemsRepository.findAllByIdDiaryCollectionId(request.collectionId)
 
-        diaryCollectionItemsRepository.save(DiaryCollectionItems(request.diaryId,request.collectionId,items.size))
+        diaryCollectionItemsRepository.save(DiaryCollectionItemEntity(request.diaryId,request.collectionId,items.size))
     }
 
     @Transactional(readOnly = false)

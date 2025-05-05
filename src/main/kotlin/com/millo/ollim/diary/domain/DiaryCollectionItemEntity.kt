@@ -6,14 +6,14 @@ import java.util.*
 
 @Entity
 @Table(name = "diary_collection_items")
-data class DiaryCollectionItems(
+data class DiaryCollectionItemEntity(
     @EmbeddedId
     val id: DiaryCollectionId,
 
     @MapsId("diaryId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_id")
-    val diary: DiaryEntries,
+    val diary: DiaryEntryEntity,
 
     @Column(name = "sort_order")
     var sortOrder: Int,
@@ -22,7 +22,7 @@ data class DiaryCollectionItems(
 ) {
     constructor(diaryId:UUID, collectionId:UUID,sortOrder: Int) : this(
         DiaryCollectionId(diaryId,collectionId),
-        DiaryEntries(diaryId),
+        DiaryEntryEntity(diaryId),
         sortOrder,
         LocalDateTime.now()
     )

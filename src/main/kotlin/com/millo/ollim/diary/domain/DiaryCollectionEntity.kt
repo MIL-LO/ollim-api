@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity
 @Table(name = "diary_collections")
-data class DiaryCollections(
+data class DiaryCollectionEntity(
     @Id
     @Column(name = "id", nullable = false,updatable = false)
     val collectionId: UUID,
@@ -22,7 +22,7 @@ data class DiaryCollections(
     var sortOrder: Int,
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "diary_collection_id")
-    var item: List<DiaryCollectionItems>
+    var item: List<DiaryCollectionItemEntity>
 
     ): BaseTimeEntity()
 

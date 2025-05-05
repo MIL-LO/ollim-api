@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.service
 
-import com.millo.ollim.diary.domain.DiaryEntries
+import com.millo.ollim.diary.domain.DiaryEntryEntity
 import com.millo.ollim.diary.repository.DiaryEntriesRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -12,9 +12,9 @@ import java.util.UUID
 class DiaryEntriesService (@Autowired val diaryEntriesRepository: DiaryEntriesRepository){
 
     @Transactional(readOnly = false)
-    fun save(diaryEntries: DiaryEntries) = diaryEntriesRepository.save(diaryEntries)
+    fun save(diaryEntriesEntity: DiaryEntryEntity) = diaryEntriesRepository.save(diaryEntriesEntity)
     @Transactional(readOnly = false)
-    fun update(diaryEntries: DiaryEntries) = diaryEntriesRepository.save(diaryEntries)
+    fun update(diaryEntriesEntity: DiaryEntryEntity) = diaryEntriesRepository.save(diaryEntriesEntity)
     @Transactional(readOnly = false)
     fun delete(id: UUID) = diaryEntriesRepository.deleteById(id)
 
@@ -22,6 +22,6 @@ class DiaryEntriesService (@Autowired val diaryEntriesRepository: DiaryEntriesRe
     fun findByUserIdWithIsNotDeleted(id: UUID, pageRequest: PageRequest) = diaryEntriesRepository.findAllByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(id,pageRequest)
 
     @Transactional
-    fun findById(diaryId: UUID): DiaryEntries = diaryEntriesRepository.findById(diaryId).orElseThrow()
+    fun findById(diaryId: UUID): DiaryEntryEntity = diaryEntriesRepository.findById(diaryId).orElseThrow()
 
 }

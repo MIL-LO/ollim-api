@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Document(collection = "diary_contents")
-data class DiaryContents(
+data class DiaryContentEntity(
     @Id
     @Field(name = "_id")
     val id: String,

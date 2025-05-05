@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.service
 
-import com.millo.ollim.diary.domain.DiaryEntries
+import com.millo.ollim.diary.domain.DiaryEntryEntity
 import com.millo.ollim.diary.dto.DiaryDTO
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
@@ -22,7 +22,7 @@ class DiaryService(
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
     fun createNewDiary(userId: UUID, newCreateRequest: DiaryDTO.CreateRequest): DiaryDTO.DiaryResponse {
 
-        val entry = diaryEntriesService.save(DiaryEntries(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
+        val entry = diaryEntriesService.save(DiaryEntryEntity(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
         val content = diaryContentsService.save(entry,newCreateRequest.content,newCreateRequest.imgUrl);
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
 
@@ -47,7 +47,7 @@ class DiaryService(
     }
 
     // 다이어리 응답 객체 생성
-    fun getDiaryResponse(diaryEntry: DiaryEntries) = DiaryDTO.DiaryResponse(
+    fun getDiaryResponse(diaryEntry: DiaryEntryEntity) = DiaryDTO.DiaryResponse(
         diaryEntry,
         diaryContentsService.findByDiaryId(diaryEntry.id),
         diaryEmotionsService.findByDiaryId(diaryEntry.id)
@@ -55,12 +55,12 @@ class DiaryService(
 
     @Transactional(readOnly = false)
     fun updateDiary(userId: UUID, updateDiary: DiaryDTO.UpdateRequest): DiaryDTO.DiaryResponse {
-        val diaryEntry:DiaryEntries = diaryEntriesService.findById(updateDiary.diaryId)
+        val diaryEntry:DiaryEntryEntity = diaryEntriesService.findById(updateDiary.diaryId)
         if (diaryEntry.userId != userId) {
             throw Exception("유저 아이디 불일치")
         }
         diaryEntriesService.save(
-            DiaryEntries(userId,updateDiary,diaryEntry.isDeleted)
+            DiaryEntryEntity(userId,updateDiary,diaryEntry.isDeleted)
         )
 
         val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,updateDiary.imgUrl)
@@ -73,8 +73,6 @@ class DiaryService(
 
     @Transactional(readOnly = false)
     fun deleteDiary(userId: UUID, diaryId: UUID) {
-        // diary 연결된 놈들
-        // diaryEmotions, diaryCollections, diary_entry, diary_contents, diary_collection_items
         val diaryEntry = diaryEntriesService.findById(diaryId)
         if (diaryEntry.userId != userId) {
             throw Exception("유저 아이디 불일치")

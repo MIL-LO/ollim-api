@@ -1,6 +1,6 @@
 package com.millo.ollim.diary.dto
 
-import com.millo.ollim.diary.domain.EmotionTags
+import com.millo.ollim.diary.domain.EmotionTagEntity
 import io.swagger.v3.oas.annotations.media.Schema
 
 class TagDTO{
@@ -45,7 +45,7 @@ class TagDTO{
         val category: String,
         val group: String,
     ) {
-        constructor(tag: EmotionTags) : this(
+        constructor(tag: EmotionTagEntity) : this(
             tag.id,tag.name,tag.description,tag.color,tag.category,tag.group
         )
     }
