@@ -1,27 +1,14 @@
 package com.millo.ollim.diary.service
 
 import com.millo.ollim.diary.domain.DiaryEntryEntity
-import com.millo.ollim.diary.repository.DiaryEntriesRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
-import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
+import java.util.*
 
-@Service
-class DiaryEntriesService (@Autowired val diaryEntriesRepository: DiaryEntriesRepository){
+interface DiaryEntriesService {
 
-    @Transactional(readOnly = false)
-    fun save(diaryEntriesEntity: DiaryEntryEntity) = diaryEntriesRepository.save(diaryEntriesEntity)
-    @Transactional(readOnly = false)
-    fun update(diaryEntriesEntity: DiaryEntryEntity) = diaryEntriesRepository.save(diaryEntriesEntity)
-    @Transactional(readOnly = false)
-    fun delete(id: UUID) = diaryEntriesRepository.deleteById(id)
-
-    @Transactional(readOnly = true)
-    fun findByUserIdWithIsNotDeleted(id: UUID, pageRequest: PageRequest) = diaryEntriesRepository.findAllByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(id,pageRequest)
-
-    @Transactional
-    fun findById(diaryId: UUID): DiaryEntryEntity = diaryEntriesRepository.findById(diaryId).orElseThrow()
-
+    fun save(diaryEntriesEntity: DiaryEntryEntity): DiaryEntryEntity
+    fun update(diaryEntriesEntity: DiaryEntryEntity): DiaryEntryEntity
+    fun delete(id: UUID)
+    fun findByUserIdWithIsNotDeleted(id: UUID, pageRequest: PageRequest): MutableList<DiaryEntryEntity>
+    fun findById(diaryId: UUID): DiaryEntryEntity
 }
