@@ -37,11 +37,23 @@ class DiaryDTO{
         val content: String,
         val imgUrl: String,
         val mood: String,
-        val emotionsTags: List<EmotionTag>
+        val emotionsTags: List<EmotionTag>,
+        val recommend: List<RecommendDTO.AIRecommendation>?
     ){
         constructor(diaryEntriesEntity: DiaryEntryEntity, diaryContentEntity: DiaryContentEntity, diaryEmotionEntities: List<DiaryEmotionEntity>):this(
             diaryEntriesEntity.id, diaryContentEntity.content, diaryContentEntity.imageUrl, diaryEntriesEntity.mood,
-            diaryEmotionEntities.map{ EmotionTag(it.id.tagId,it.emotionTag.id, it.emotionTag.name)}
+            diaryEmotionEntities.map{ EmotionTag(it.id.tagId,it.emotionTag.id, it.emotionTag.name)}, emptyList()
+        )
+
+        constructor(
+            diaryEntriesEntity: DiaryEntryEntity,
+            diaryContentEntity: DiaryContentEntity,
+            diaryEmotionEntities: List<DiaryEmotionEntity>,
+            recommend: Array<RecommendDTO.AIRecommendation>?
+        ) : this(
+            diaryEntriesEntity.id, diaryContentEntity.content, diaryContentEntity.imageUrl, diaryEntriesEntity.mood,
+            diaryEmotionEntities.map{ EmotionTag(it.id.tagId,it.emotionTag.id, it.emotionTag.name)},
+            recommend?.asList()
         )
     }
 
