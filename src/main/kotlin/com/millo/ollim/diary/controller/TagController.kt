@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("${Versions.V1}/tag")
 @Tag(name = "Tag", description = "감정 태그 생성,수정,삭제,전체조회 기능")
 class TagController(
-    @Autowired val emotionTagsService: EmotionTagsService)
+    @Autowired val emotionTagsService: EmotionTagsService
+)
 {
 
     @PostMapping
