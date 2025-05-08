@@ -6,9 +6,15 @@ import java.util.*
 
 @Entity
 @Table(name = "diary_collection_items")
-data class DiaryCollectionItems(
+data class DiaryCollectionItemEntity(
     @EmbeddedId
     val id: DiaryCollectionId,
+
+    @MapsId("diaryId")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "diary_id")
+    val diary: DiaryEntryEntity,
+
     @Column(name = "sort_order")
     var sortOrder: Int,
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -16,6 +22,7 @@ data class DiaryCollectionItems(
 ) {
     constructor(diaryId:UUID, collectionId:UUID,sortOrder: Int) : this(
         DiaryCollectionId(diaryId,collectionId),
+        DiaryEntryEntity(diaryId),
         sortOrder,
         LocalDateTime.now()
     )

@@ -1,18 +1,13 @@
 package com.millo.ollim.diary.domain
 
 import com.millo.ollim.common.domain.BaseTimeEntity
-import com.millo.ollim.diary.request.UpdateDiary
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import java.time.LocalDate
-import java.time.LocalDateTime
+import com.millo.ollim.diary.dto.DiaryDTO
+import jakarta.persistence.*
 import java.util.*
 
 @Entity
 @Table(name = "diary_entries")
-data class DiaryEntries(
+data class DiaryEntryEntity(
     @Id
     @Column(name = "id", nullable = false)
     val id: UUID,
@@ -30,7 +25,7 @@ data class DiaryEntries(
         UUID.randomUUID(), userId,
         mood, emotionTag, false)
 
-    constructor(userId:UUID, updateDiary: UpdateDiary,isDeleted: Boolean) : this(
+    constructor(userId:UUID, updateDiary: DiaryDTO.UpdateRequest,isDeleted: Boolean) : this(
         updateDiary.diaryId, userId,
         updateDiary.mood,updateDiary.emotionTags.toString(),
         isDeleted)
