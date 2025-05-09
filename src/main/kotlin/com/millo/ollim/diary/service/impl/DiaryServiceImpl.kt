@@ -13,7 +13,12 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.awt.image.BufferedImage
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.*
+import javax.imageio.ImageIO
 
 @Service
 class DiaryServiceImpl(
@@ -28,7 +33,14 @@ class DiaryServiceImpl(
     override fun createNewDiary(userId: UUID, newCreateRequest: DiaryDTO.CreateRequest): DiaryDTO.DiaryResponse {
 
         val entry = diaryEntriesService.save(DiaryEntryEntity(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
-        val content = diaryContentsService.save(entry,newCreateRequest.content,newCreateRequest.imgUrl);
+
+        val img = ""
+        // ImageIO로 이미지 압축? 가능한 것 같음
+        // https://stackoverflow.com/questions/44565500/how-can-i-compress-images-using-java
+//        val out: OutputStream = FileOutputStream(newCreateRequest.imgUrl.)
+
+
+        val content = diaryContentsService.save(entry,newCreateRequest.content,img);
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
         val profile = userProfileService.getProfile(userId)
 
@@ -78,7 +90,9 @@ class DiaryServiceImpl(
             DiaryEntryEntity(userId,updateDiary,diaryEntry.isDeleted)
         )
 
-        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,updateDiary.imgUrl)
+        val img = ""
+
+        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,img)
 
         diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
         val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)
