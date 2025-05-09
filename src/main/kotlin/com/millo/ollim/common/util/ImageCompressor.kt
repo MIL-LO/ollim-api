@@ -1,7 +1,8 @@
 package com.millo.ollim.common.util
 
-import com.millo.ollim.Application
 import org.springframework.web.multipart.MultipartFile
+import java.awt.Image
+import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.imageio.IIOImage
@@ -38,8 +39,14 @@ class ImageCompressor {
         val imageOutputStream: ImageOutputStream = MemoryCacheImageOutputStream(baos)
         imageWriter.output = imageOutputStream
 
-        val image = IIOImage(ImageIO.read(mpFile.inputStream), null,null)
+        // 이미지 크기 조정
+        val origin = ImageIO.read(mpFile.inputStream).getScaledInstance(300,300, Image.SCALE_DEFAULT)
+        val resizedImage = BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB)
+        val graphics = resizedImage.createGraphics()
+        graphics.drawImage(origin.getScaledInstance(300, 300, Image.SCALE_SMOOTH), 0, 0, null)
+        graphics.dispose()
 
+        val image = IIOImage(resizedImage, null, null)
         imageWriter.write(null, image, imageWriteParam)
 
         val file = File("C:\\Users\\daers\\Documents\\GitHub\\ollim-api\\src\\main\\kotlin\\com\\millo\\ollim\\common\\util\\images\\"+mpFile.originalFilename)
