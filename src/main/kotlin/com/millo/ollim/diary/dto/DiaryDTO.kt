@@ -37,8 +37,8 @@ class DiaryDTO{
         val content: String,
         val imgUrl: String,
         val mood: String,
-        val emotionsTags: List<EmotionTag>,
-        val recommend: List<RecommendDTO.AIRecommendation>?
+        val emotionsTags: List<EmotionTag>?= emptyList(),
+        val recommend: List<RecommendDTO.AIRecommendation>?= emptyList(),
     ){
         constructor(diaryEntriesEntity: DiaryEntryEntity, diaryContentEntity: DiaryContentEntity, diaryEmotionEntities: List<DiaryEmotionEntity>):this(
             diaryEntriesEntity.id, diaryContentEntity.content, diaryContentEntity.imageUrl, diaryEntriesEntity.mood,
