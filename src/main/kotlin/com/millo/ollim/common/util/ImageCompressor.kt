@@ -1,67 +1,83 @@
 package com.millo.ollim.common.util
 
 import org.springframework.web.multipart.MultipartFile
-import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.io.File
 import javax.imageio.IIOImage
 import javax.imageio.ImageIO
 import javax.imageio.ImageWriteParam
-import javax.imageio.ImageWriter
-import javax.imageio.stream.ImageOutputStream
 import javax.imageio.stream.MemoryCacheImageOutputStream
 
 
+/**
+ * 이미지 압축
+ *
+ * 다이어리 생성 요청 시 이미지가 있는 경우 동작한다. 만약 이미지를 서버에 전달하기 전, 이미지 압축, 크기 조정하기 위함
+ *
+ * */
 class ImageCompressor {
 
     fun compressImage(mpFile: MultipartFile, q:Int): ByteArray {
 
-        // 품질
-        val quality = q*0.01f
-        // 이미지명, 확장자 확인
-        val imageName = mpFile.originalFilename
-        // jpg, jpeg ...
-        val imageExtension = imageName!!.substring(imageName.lastIndexOf(".") + 1)
+        // 품질, 이미지명, 이미지 확장자
+        val quality= q * 0.01f // 0.0f: 최대 압축  1.0f: 최고 품질
+        val name= mpFile.originalFilename
+            ?: throw IllegalArgumentException("Image file name is null")
+        val extension= name.substringAfterLast('.', "").lowercase()
 
-        // 요청 이미지의 확장자를 가지는 ImageWriter 호출
-        val imageWriter:ImageWriter = ImageIO.getImageWritersByFormatName(imageExtension).next()
-        val imageWriteParam = imageWriter.defaultWriteParam
+        // ImageWriter - 이미지 설정 객체
+        val writer= ImageIO.getImageWritersByFormatName(extension).asSequence().firstOrNull()
+            ?: throw IllegalArgumentException("No suitable ImageWriter found for extension: ${extension}")
 
-        // explicit: 압축 수준을 명시적으로 제어 가능해짐
-        imageWriteParam.compressionMode = ImageWriteParam.MODE_EXPLICIT
-        // 압축 진행
-        // 0.0f: 최대 압축     1.0: 최고 품질
-        imageWriteParam.compressionQuality = quality
-
-        // 출력 설정
+        // 출력 객체 (이미지 압축 결과 담을 곳)
         val baos= ByteArrayOutputStream()
-        val imageOutputStream: ImageOutputStream = MemoryCacheImageOutputStream(baos)
-        imageWriter.output = imageOutputStream
+        val imageOutputStream= MemoryCacheImageOutputStream(baos)
 
-        // 이미지 크기 조정
-        val origin = ImageIO.read(mpFile.inputStream).getScaledInstance(300,300, Image.SCALE_DEFAULT)
-        val resizedImage = BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB)
-        val graphics = resizedImage.createGraphics()
-        graphics.drawImage(origin.getScaledInstance(300, 300, Image.SCALE_SMOOTH), 0, 0, null)
-        graphics.dispose()
+        // 결과 저장될 위치 설정
+        writer.output = imageOutputStream
 
-        val image = IIOImage(resizedImage, null, null)
-        imageWriter.write(null, image, imageWriteParam)
+        try{
+            // explicit: 압축 수준을 명시적으로 제어 가능해짐
+            val param= writer.defaultWriteParam.apply {
+                if(canWriteCompressed()){
+                    compressionMode = ImageWriteParam.MODE_EXPLICIT
+                    compressionQuality = quality
+                }
+            }
 
-        val file = File("C:\\Users\\daers\\Documents\\GitHub\\ollim-api\\src\\main\\kotlin\\com\\millo\\ollim\\common\\util\\images\\"+mpFile.originalFilename)
-        mpFile.transferTo(file)
+            // 이미지 압축 실행
+            val image= IIOImage(resize(mpFile), null, null)
+            writer.write(null, image, param)
 
-        imageOutputStream.close()
-        baos.close()
-        imageWriter.dispose()
+        }catch (e:Exception){
+            throw RuntimeException(e)
 
-        val file2 = File("C:\\Users\\daers\\Documents\\GitHub\\ollim-api\\src\\main\\kotlin\\com\\millo\\ollim\\common\\util\\images\\after\\"+mpFile.originalFilename)
-        file2.writeBytes(baos.toByteArray())
-
-        println("원본 파일 크기: ${file.length()} bytes")
-        println("압축된 파일 크기: ${file2.length()} bytes")
+        }finally {
+            imageOutputStream.close()
+            baos.close()
+            writer.dispose()
+        }
 
         return baos.toByteArray()
     }
+
+    // 이미지 크기 조정 로직 - 80%
+    private fun resize(mpFile: MultipartFile):BufferedImage{
+
+        val ratio = 0.8
+
+        val image = ImageIO.read(mpFile.inputStream)
+        val width = (image.width*ratio).toInt()
+        val height = (image.height*ratio).toInt()
+
+        val resizedImage= BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+
+        resizedImage.createGraphics().apply {
+            drawImage(image, 0, 0, null)
+            dispose()
+        }
+
+        return resizedImage
+    }
+
 }

@@ -25,7 +25,7 @@ class DiaryDTO{
         val diaryId: UUID,
         @Schema(description = "다이어리 내용", example = "오늘 날씨가 매우 좋았다.")
         val content: String,
-        @Schema(description = "이미지 파일")
+        @Schema(description = "이미지 파일 (MultipartFile)")
         val imgUrl: MultipartFile? = null,
         @Schema(description = "기분", example = "좋음")
         val mood: String,

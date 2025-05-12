@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.service.impl
 
+import com.millo.ollim.common.util.ImageCompressor
 import com.millo.ollim.diary.domain.DiaryEntryEntity
 import com.millo.ollim.diary.dto.DiaryDTO
 import com.millo.ollim.diary.dto.RecommendDTO
@@ -34,13 +35,10 @@ class DiaryServiceImpl(
 
         val entry = diaryEntriesService.save(DiaryEntryEntity(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
 
-        val img = ""
-        // ImageIO로 이미지 압축? 가능한 것 같음
-        // https://stackoverflow.com/questions/44565500/how-can-i-compress-images-using-java
-//        val out: OutputStream = FileOutputStream(newCreateRequest.imgUrl.)
+        // 이미지 압축
+        val fixedImg: ByteArray= ImageCompressor().compressImage(newCreateRequest.imgUrl!!, 5)
 
-
-        val content = diaryContentsService.save(entry,newCreateRequest.content,img);
+        val content = diaryContentsService.save(entry,newCreateRequest.content,fixedImg.toString());
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
         val profile = userProfileService.getProfile(userId)
 
@@ -90,9 +88,11 @@ class DiaryServiceImpl(
             DiaryEntryEntity(userId,updateDiary,diaryEntry.isDeleted)
         )
 
-        val img = ""
+        // 이미지 압축
+        val compressor = ImageCompressor()
+        val fixedImg: ByteArray= compressor.compressImage(updateDiary.imgUrl!!, 5)
 
-        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,img)
+        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,fixedImg.toString())
 
         diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
         val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)
