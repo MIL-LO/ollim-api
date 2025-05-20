@@ -60,16 +60,19 @@ class OAuth2SuccessHandler(
 
         log.info(">>> [OAuth2 인증 성공] userId=$userId, status=$status, refreshToken 저장 완료")
 
-        // JSON 응답 반환
-        val tokenResponse = mapOf(
-            "accessToken" to accessToken,
-            "refreshToken" to refreshToken,
-            "status" to status.name
-        )
+        // 프론트엔드 URL 설정
+        val frontendUrl = if (request.serverPort == 5000) {
+            "http://localhost:7777"
+        } else {
+            "https://millo-ollim.com"
+        }
 
-        response.status = HttpServletResponse.SC_OK
-        response.contentType = "application/json"
-        response.characterEncoding = "UTF-8"
-        response.writer.write(objectMapper.writeValueAsString(tokenResponse))
+        // 토큰 정보를 URL 파라미터로 전달하며 프론트엔드로 리디렉션
+        response.sendRedirect(
+            "$frontendUrl/auth/callback?" +
+            "accessToken=$accessToken&" +
+            "refreshToken=$refreshToken&" +
+            "status=${status.name}"
+        )
     }
 }
