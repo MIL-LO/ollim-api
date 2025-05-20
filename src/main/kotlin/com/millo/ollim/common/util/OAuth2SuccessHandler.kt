@@ -60,19 +60,20 @@ class OAuth2SuccessHandler(
 
         log.info(">>> [OAuth2 인증 성공] userId=$userId, status=$status, refreshToken 저장 완료")
 
+
         // 프론트엔드 URL 설정
-        val frontendUrl = when (request.serverName) {
-            "localhost" -> "http://localhost:7777"
-            "dev.millo-ollim.com" -> "https://dev.millo-ollim.com"
-            else -> "https://app.millo-ollim.com"
+        val frontendUrl = if (request.serverPort == 5000) {
+            "http://localhost:7777"
+        } else {
+            "https://dev.millo-ollim.com"
         }
 
         // 토큰 정보를 URL 파라미터로 전달하며 프론트엔드로 리디렉션
         response.sendRedirect(
             "$frontendUrl/auth/callback?" +
-                "accessToken=$accessToken&" +
-                "refreshToken=$refreshToken&" +
-                "status=${status.name}"
+            "accessToken=$accessToken&" +
+            "refreshToken=$refreshToken&" +
+            "status=${status.name}"
         )
     }
 }
