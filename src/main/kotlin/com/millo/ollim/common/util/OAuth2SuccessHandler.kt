@@ -62,11 +62,7 @@ class OAuth2SuccessHandler(
 
 
         // 프론트엔드 URL 설정
-        val frontendUrl = if (request.serverPort == 5000) {
-            "http://localhost:7777"
-        } else {
-            "https://dev.millo-ollim.com"
-        }
+        val frontendUrl = "http://localhost:7777"
 
         // 토큰 정보를 URL 파라미터로 전달하며 프론트엔드로 리디렉션
         response.sendRedirect(
