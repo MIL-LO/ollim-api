@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
-class DiaryEntriesServiceImpl (
+open class DiaryEntriesServiceImpl (
     @Autowired val diaryEntriesRepository: DiaryEntriesRepository
 ): DiaryEntriesService {
 

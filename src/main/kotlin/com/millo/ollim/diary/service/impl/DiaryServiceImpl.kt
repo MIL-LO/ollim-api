@@ -13,22 +13,16 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.client.RestTemplate
-import java.awt.image.BufferedImage
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
 import java.util.*
-import javax.imageio.ImageIO
 
 @Service
-class DiaryServiceImpl(
-    @Autowired private val diaryEntriesService: DiaryEntriesService,
-    @Autowired private val diaryContentsService: DiaryContentsService,
-    @Autowired private val diaryEmotionsService: DiaryEmotionsService,
-    @Autowired private val diaryCollectionItemsService: DiaryCollectionItemsService,
-    @Autowired private val userProfileService: UserProfileService,
-    @Autowired private val aiConnector: AIConnector,
+open class DiaryServiceImpl(
+    @Autowired val diaryEntriesService: DiaryEntriesService,
+    @Autowired val diaryContentsService: DiaryContentsService,
+    @Autowired val diaryEmotionsService: DiaryEmotionsService,
+    @Autowired val diaryCollectionItemsService: DiaryCollectionItemsService,
+    @Autowired val userProfileService: UserProfileService,
+    @Autowired val aiConnector: AIConnector,
     ): DiaryService  {
 
     // 다이어리 생성 - entry + content + emotionTag
@@ -38,7 +32,9 @@ class DiaryServiceImpl(
         val entry = diaryEntriesService.save(DiaryEntryEntity(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
 
         // 이미지 압축
-        val fixedImg: ByteArray= ImageCompressor().compressImage(newCreateRequest.imgUrl!!, 5)
+        var fixedImg= ByteArray(10000)
+        if (newCreateRequest.imgUrl!=null)
+            fixedImg= ImageCompressor().compressImage(newCreateRequest.imgUrl, 5)
 
         val content = diaryContentsService.save(entry,newCreateRequest.content,fixedImg.toString());
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
