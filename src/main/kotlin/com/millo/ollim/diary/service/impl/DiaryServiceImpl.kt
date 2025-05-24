@@ -1,6 +1,7 @@
 package com.millo.ollim.diary.service.impl
 
 import com.millo.ollim.common.util.AIConnector
+import com.millo.ollim.common.util.ImageCompressor
 import com.millo.ollim.diary.domain.DiaryEntryEntity
 import com.millo.ollim.diary.dto.DiaryDTO
 import com.millo.ollim.diary.dto.RecommendDTO
@@ -12,7 +13,13 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.client.RestTemplate
+import java.awt.image.BufferedImage
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.*
+import javax.imageio.ImageIO
 
 @Service
 class DiaryServiceImpl(
@@ -29,7 +36,11 @@ class DiaryServiceImpl(
     override fun createNewDiary(userId: UUID, newCreateRequest: DiaryDTO.CreateRequest): DiaryDTO.DiaryResponse {
 
         val entry = diaryEntriesService.save(DiaryEntryEntity(userId,newCreateRequest.mood,newCreateRequest.emotionTags.toString()))
-        val content = diaryContentsService.save(entry,newCreateRequest.content,newCreateRequest.imgUrl);
+
+        // 이미지 압축
+        val fixedImg: ByteArray= ImageCompressor().compressImage(newCreateRequest.imgUrl!!, 5)
+
+        val content = diaryContentsService.save(entry,newCreateRequest.content,fixedImg.toString());
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
         val profile = userProfileService.getProfile(userId)
 
@@ -82,7 +93,11 @@ class DiaryServiceImpl(
             DiaryEntryEntity(userId,updateDiary,diaryEntry.isDeleted)
         )
 
-        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,updateDiary.imgUrl)
+        // 이미지 압축
+        val compressor = ImageCompressor()
+        val fixedImg: ByteArray= compressor.compressImage(updateDiary.imgUrl!!, 5)
+
+        val diaryContents = diaryContentsService.update(diaryEntry.id, updateDiary.content,fixedImg.toString())
 
         diaryEmotionsService.deleteByDiaryId(diaryEntry.id)
         val diaryEmotions = diaryEmotionsService.save(diaryEntry.id, updateDiary.emotionTags)

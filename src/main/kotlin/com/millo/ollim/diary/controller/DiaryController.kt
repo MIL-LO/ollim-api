@@ -20,7 +20,7 @@ class DiaryController(
 
     @PostMapping("")
     @Operation(summary = "다이어리 생성", description = "새로운 다이어리 생성합니다.")
-    fun createNewDiary(@AuthenticationPrincipal user: UserPrincipal, @RequestBody newCreateRequest: DiaryDTO.CreateRequest)
+    fun createNewDiary(@AuthenticationPrincipal user: UserPrincipal, @ModelAttribute newCreateRequest: DiaryDTO.CreateRequest)
     : ResponseEntity<DiaryDTO.DiaryResponse> =
         ResponseEntity.ok().body(diaryService.createNewDiary(user.userId,newCreateRequest))
 
@@ -38,7 +38,7 @@ class DiaryController(
 
     @PutMapping("")
     @Operation(summary = "다이어리 수정", description = "다이어리의 내용을 수정합니다.")
-    fun updateDiary(@AuthenticationPrincipal user: UserPrincipal, @RequestBody updateDiary: DiaryDTO.UpdateRequest)
+    fun updateDiary(@AuthenticationPrincipal user: UserPrincipal, @ModelAttribute updateDiary: DiaryDTO.UpdateRequest)
     : ResponseEntity<DiaryDTO.DiaryResponse> =
         ResponseEntity.ok().body(diaryService.updateDiary(user.userId,updateDiary))
 
