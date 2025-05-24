@@ -1,5 +1,6 @@
 package com.millo.ollim.diary.service.impl
 
+import com.millo.ollim.common.util.AIConnector
 import com.millo.ollim.diary.domain.DiaryEntryEntity
 import com.millo.ollim.diary.dto.DiaryDTO
 import com.millo.ollim.diary.dto.RecommendDTO
@@ -8,22 +9,22 @@ import com.millo.ollim.user.service.UserProfileService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Isolation
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.client.RestTemplate
 import java.util.*
 
 @Service
 class DiaryServiceImpl(
-    @Autowired val diaryEntriesService: DiaryEntriesService,
-    @Autowired val diaryContentsService: DiaryContentsService,
-    @Autowired val diaryEmotionsService: DiaryEmotionsService,
-    @Autowired val diaryCollectionItemsService: DiaryCollectionItemsService,
-    @Autowired val userProfileService: UserProfileService
+    @Autowired private val diaryEntriesService: DiaryEntriesService,
+    @Autowired private val diaryContentsService: DiaryContentsService,
+    @Autowired private val diaryEmotionsService: DiaryEmotionsService,
+    @Autowired private val diaryCollectionItemsService: DiaryCollectionItemsService,
+    @Autowired private val userProfileService: UserProfileService,
+    @Autowired private val aiConnector: AIConnector,
     ): DiaryService  {
 
+    // 다이어리 생성 - entry + content + emotionTag
     @Transactional(readOnly = false, isolation = Isolation.SERIALIZABLE)
     override fun createNewDiary(userId: UUID, newCreateRequest: DiaryDTO.CreateRequest): DiaryDTO.DiaryResponse {
 
@@ -32,7 +33,8 @@ class DiaryServiceImpl(
         val diaryEmotions = diaryEmotionsService.save(entry.id, newCreateRequest.emotionTags)
         val profile = userProfileService.getProfile(userId)
 
-        val recommend = sendDiaryToAI(RecommendDTO.DiaryRequestToAI(
+        // ollime-ai 요청
+        val recommend = aiConnector.sendDiaryToAI(RecommendDTO.DiaryRequestToAI(
             userId.toString(),
             entry.id.toString(),
             content.content,
@@ -41,8 +43,10 @@ class DiaryServiceImpl(
             20.toString(),
             profile.activitySpaces.toString()
         )))
+
         return DiaryDTO.DiaryResponse(entry,content,diaryEmotions,recommend)
     }
+
 
     @Transactional(readOnly = true)
     override fun getDiaries(userId: UUID, pageNum:Int): List<DiaryDTO.DiaryResponse> {
@@ -113,13 +117,4 @@ class DiaryServiceImpl(
             diaryEmotionsService.findByDiaryId(diaryId))
     }
 
-    fun sendDiaryToAI(diaryRequestToAI: RecommendDTO.DiaryRequestToAI): Array<RecommendDTO.AIRecommendation>? {
-        val url = "http://localhost:8001/recommend"
-        val restTemplate = RestTemplate()
-        val response: ResponseEntity<Array<RecommendDTO.AIRecommendation>> =
-            restTemplate.postForEntity(url, diaryRequestToAI,  Array<RecommendDTO.AIRecommendation>::class.java)
-        println("response = ${response.body}")
-
-        return response.body
-    }
 }
