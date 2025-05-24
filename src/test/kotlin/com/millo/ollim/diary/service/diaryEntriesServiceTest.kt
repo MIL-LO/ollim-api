@@ -1,7 +1,11 @@
 package com.millo.ollim.diary.service
 
+import com.millo.ollim.common.util.AIConnector
 import com.millo.ollim.diary.domain.*
+import com.millo.ollim.diary.dto.DiaryDTO
 import com.millo.ollim.diary.service.impl.DiaryServiceImpl
+import com.millo.ollim.user.domain.*
+import com.millo.ollim.user.dto.UserProfileDTO
 import com.millo.ollim.user.service.UserProfileService
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.collections.shouldBeEmpty
@@ -12,6 +16,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -22,9 +27,31 @@ class diaryEntriesServiceTest:StringSpec ({
     lateinit var userProfileService: UserProfileService
     lateinit var diaryContentService: DiaryContentsService
     lateinit var diaryCollectionItemsService: DiaryCollectionItemsService
+    lateinit var aiConnector: AIConnector
 
     lateinit var diaryService: DiaryServiceImpl
+
     val userId = UUID.randomUUID()
+    val user = UserEntity(
+        id = userId,
+        email = "email",
+        role = UserRole.USER,
+        status = UserStatus.PENDING,
+        lastLoginAt = LocalDateTime.now(),
+        withdrawnAt = LocalDateTime.now(),
+        profile = null,
+    )
+    val profile = UserProfileDTO.UserProfileResponse(
+        nickname = "nick",
+        gender = "man",
+        birthDate = LocalDate.now(),
+        activeTime = "active time",
+        energyType = "energy time",
+        activitySpaces = "",
+        mbti = UserMBTI.ENFJ,
+        profileImage = null,
+    )
+
     val entries = mutableListOf(
         DiaryEntryEntity(UUID.randomUUID(),userId,"mood", "1",false),
         DiaryEntryEntity(UUID.randomUUID(),userId,"mood", "1",false),
@@ -60,20 +87,21 @@ class diaryEntriesServiceTest:StringSpec ({
          userProfileService= mockk()
          diaryContentService= mockk()
          diaryCollectionItemsService= mockk()
+        aiConnector = mockk()
 
         diaryService= DiaryServiceImpl(
             diaryEntriesService,
             diaryContentService,
             diaryEmotionsService,
             diaryCollectionItemsService,
-            userProfileService
+            userProfileService,
+            aiConnector
         )
 
     }
 
     "다이어리 조회 - 아무 다이어리 없는 경우 빈 배열 반환한다. "{
         // given
-        val userId= UUID.randomUUID()
         val page= 1
         val expectPage= PageRequest.of(page - 1, 10, Sort.by("createdAt").descending())
         every {
@@ -92,7 +120,6 @@ class diaryEntriesServiceTest:StringSpec ({
 
     "다이어리 조회 - 최신순으로 정렬된 형태로 반환한다." {
         // given
-        val userId = UUID.randomUUID()
         val page= 1
         val expectPage= PageRequest.of(page - 1, 10, Sort.by("createdAt").descending())
 
@@ -117,6 +144,40 @@ class diaryEntriesServiceTest:StringSpec ({
         }
     }
 
+    "다이어리 생성" {
+        // given
+        val request = DiaryDTO.CreateRequest("content",null,"mood", listOf(1,2,3))
+        every{
+            diaryEntriesService.save(any())
+        } returns entries[0]
+        every{
+            diaryContentService.save(any(), any(),any())
+        } returns contents[0]
+        every{
+            diaryEmotionsService.save(any(),request.emotionTags)
+        } returns diaryTags
+        every {
+            userProfileService.getProfile(userId)
+        }returns profile
+        every {
+            aiConnector.sendDiaryToAI(any())
+        }returns emptyArray()
 
+        // when
+        diaryService.createNewDiary(userId,request)
+        // then
+        verify{
+            diaryEntriesService.save(any())
+        }
+        verify{
+            diaryContentService.save(any(), any(),any())
+        }
+        verify{
+            diaryEmotionsService.save(any(),request.emotionTags)
+        }
+        verify {
+            userProfileService.getProfile(userId)
+        }
+    }
 
 })
