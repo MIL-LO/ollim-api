@@ -18,7 +18,6 @@ class SwaggerConfig(val env: Environment) {
         val servers = listOf(
             "SWAGGER_SERVER_LOCAL" to "로컬",
             "SWAGGER_SERVER_PROD" to "운영",
-            "SWAGGER_SERVER_NGROK" to "NGROK"
         ).mapNotNull { (envKey, name) ->
             env.getProperty(envKey)?.let { url -> Server().url(url).description(name) }
         }

@@ -5,6 +5,7 @@ import com.millo.ollim.auth.domain.UserPrincipal
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
@@ -22,6 +23,8 @@ import java.time.Duration
  */
 @Component
 class OAuth2SuccessHandler(
+    @Value("\${app.frontend-url}")
+    private val frontendUrl: String,
     private val jwtTokenProvider: JwtTokenProvider,
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper = ObjectMapper()
@@ -59,10 +62,6 @@ class OAuth2SuccessHandler(
         redisTemplate.opsForValue().set(redisKey, refreshToken, Duration.ofDays(14))
 
         log.info(">>> [OAuth2 인증 성공] userId=$userId, status=$status, refreshToken 저장 완료")
-
-
-        // 프론트엔드 URL 설정
-        val frontendUrl = "http://localhost:7777"
 
         // 토큰 정보를 URL 파라미터로 전달하며 프론트엔드로 리디렉션
         response.sendRedirect(
