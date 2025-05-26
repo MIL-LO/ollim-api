@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class EmotionTagsServiceImpl(
+open class EmotionTagsServiceImpl(
     private val emotionTagsRepository: EmotionTagsRepository,
     private val emotionsService: DiaryEmotionsService
 ): EmotionTagsService {

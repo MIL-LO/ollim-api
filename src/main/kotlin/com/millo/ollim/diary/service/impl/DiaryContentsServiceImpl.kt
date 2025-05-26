@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.util.*
 
 @Service
-class DiaryContentsServiceImpl(
+open class DiaryContentsServiceImpl(
     @Autowired val diaryContentsRepository: DiaryContentsRepository
 ): DiaryContentsService {
 
