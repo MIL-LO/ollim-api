@@ -11,4 +11,5 @@ interface DiaryService {
     fun updateDiary(userId: UUID, updateDiary: DiaryDTO.UpdateRequest): DiaryDTO.DiaryResponse
     fun getDiary(userId: UUID, diaryId: UUID): DiaryDTO.DiaryResponse
     fun deleteDiary(userId: UUID, diaryId: UUID)
+    fun customGetDiary(user: UUID, diaryId: UUID?, pageNum: Int?, pageSize: Int?): Any
 }

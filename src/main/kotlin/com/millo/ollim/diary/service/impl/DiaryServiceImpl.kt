@@ -128,4 +128,23 @@ open class DiaryServiceImpl(
             diaryEmotionsService.findByDiaryId(diaryId))
     }
 
+    @Transactional(readOnly = true)
+    override fun customGetDiary(user: UUID, diaryId: UUID?, pageNum: Int?, pageSize: Int?): MutableList<DiaryDTO.DiaryResponse> {
+
+        if (diaryId == null) {// null이면 전체조회
+            val res:MutableList<DiaryDTO.DiaryResponse> = mutableListOf()
+            val entries = diaryEntriesService.findByUserIdWithIsNotDeleted(
+                id = user,
+                PageRequest.of(pageNum!! -1, pageSize!!, Sort.by("createdAt").descending())
+            )
+            entries.forEach { diaryEntry ->
+                res.add(getDiaryResponse(diaryEntry))
+            }
+
+            return res
+        }
+
+        // 단일결과만 반환
+        return mutableListOf( getDiary(userId = user, diaryId= diaryId))
+    }
 }

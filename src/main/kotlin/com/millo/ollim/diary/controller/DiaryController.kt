@@ -48,4 +48,14 @@ class DiaryController(
         ResponseEntity.ok().body(diaryService.deleteDiary(user.userId, diaryId))
     }
 
+    @GetMapping("/custom")
+    @Operation(summary="다이어리 조회 커스텀", description="다이어리 조회를 필요한 것들만 처리하도록 합니다.")
+    fun customGetDiary(
+        @AuthenticationPrincipal user:UserPrincipal,    // 요청 유저 정보
+        @RequestParam diaryId: UUID ?= null,            // 널널~이면 리스트
+        @RequestParam pageNum:Int   ?= 1,               // 없으면 1 초기화
+        @RequestParam pageSize:Int  ?= 10,              // 없으면 10 초기화
+    ){
+        ResponseEntity.ok().body(diaryService.customGetDiary(user.userId,diaryId,pageNum,pageSize))
+    }
 }
